@@ -1,0 +1,18 @@
+{
+  "author": "Nathan Rajlich <nathan@tootallnate.net> (http://tootallnate.net)",
+  "name": "iTunes",
+  "description": "A native node interface to interact with an iTunes process.",
+  "version": "0.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/TooTallNate/node-iTunes.git"
+  },
+  "main": "./index.js",
+  "engines": {
+    "node": ">= v0.4.0"
+  },
+  "dependencies": {
+    "autoreleasepool": "0.x.x"
+  },
+  "devDependencies": {}
+}
