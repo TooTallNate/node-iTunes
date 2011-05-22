@@ -4,14 +4,24 @@
 
 namespace node_iTunes {
 
+struct create_connection_request {
+  char* host;
+  char* username;
+  char* password;
+  v8::Persistent<v8::Function> cb;
+  iTunesApplication* iTunesRef;
+};
+
+int CreateConnection_Do (eio_req *req);
+int CreateConnection_After (eio_req *req);
+
 class Application : public node::ObjectWrap {
-private:
+public:
   iTunesApplication* iTunesRef;
 
-public:
   static v8::Persistent<v8::FunctionTemplate> constructor_template;
 
-  Application(iTunesApplication* itunes);
+  Application();
   ~Application();
 
   static void Init(v8::Handle<v8::Object>);
@@ -40,6 +50,8 @@ public:
 
   static v8::Handle<v8::Value> GetVolumeSync(const v8::Arguments&);
   static v8::Handle<v8::Value> SetVolumeSync(const v8::Arguments&);
+
+  static v8::Handle<v8::Value> CreateConnection(const v8::Arguments&);
 
 }; // class iTunesApplication
 

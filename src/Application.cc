@@ -42,23 +42,25 @@ void Application::Init(v8::Handle<Object> target) {
   NODE_SET_PROTOTYPE_METHOD(t, "getVolumeSync", GetVolumeSync);
   NODE_SET_PROTOTYPE_METHOD(t, "setVolumeSync", SetVolumeSync);
 
+  NODE_SET_METHOD(target, "createConnection", CreateConnection);
+
   target->Set(repo_class_symbol, constructor_template->GetFunction());
 }
 
-Application::Application(iTunesApplication* itunes) {
-  //iTunesRef = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
-  //iTunesRef = [SBApplication applicationWithURL: [NSURL URLWithString: @"eppc://10.0.1.10/iTunes"]];
-  iTunesRef = itunes;
+
+Application::Application() {
 }
 
 Application::~Application() {
+  if (iTunesRef) {
+    [iTunesRef release];
+  }
   iTunesRef = nil;
 }
 
 v8::Handle<Value> Application::New(const Arguments& args) {
   HandleScope scope;
-  iTunesApplication* itunes = [SBApplication applicationWithURL: [NSURL URLWithString: @"eppc://10.0.1.10/iTunes"]];
-  Application* hw = new Application(itunes);
+  Application* hw = new Application();
   hw->Wrap(args.This());
   return args.This();
 }
@@ -76,9 +78,63 @@ v8::Handle<Value> Application::SetVolumeSync(const Arguments& args) {
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
   iTunesApplication* iTunes = it->iTunesRef;
   int val = args[0]->ToInteger()->Int32Value();
-  iTunes.soundVolume = val;
+  [iTunes setSoundVolume:val];
   Local<Integer> result = Integer::New([iTunes soundVolume]);
   return scope.Close(result);
+}
+
+// Begins asynchronously creating a new Application instance. This should be
+// done on the thread pool, since the SBApplication constructor methods can
+// potentially block for a very long time (especially if a modal dialog is
+// raised for user credentials).
+v8::Handle<Value> Application::CreateConnection(const Arguments& args) {
+  HandleScope scope;
+
+  create_connection_request* ccr = (create_connection_request *) malloc(sizeof(struct create_connection_request));
+  ccr->host = NULL;
+  ccr->username = NULL;
+  ccr->password = NULL;
+
+  Local<Function> cb = Local<Function>::Cast(args[0]);
+  ccr->cb = Persistent<Function>::New(cb);
+
+  eio_custom(CreateConnection_Do, EIO_PRI_DEFAULT, CreateConnection_After, ccr);
+  ev_ref(EV_DEFAULT_UC);
+  return Undefined();
+}
+
+// Creates the SBApplication instance. This is called on the thread pool since
+// it can block for a long time.
+int CreateConnection_Do (eio_req *req) {
+  NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+  struct create_connection_request * ccr = (struct create_connection_request *)req->data;
+  ccr->iTunesRef = [SBApplication applicationWithURL: [NSURL URLWithString: @"eppc://10.0.1.10/iTunes"]];
+  [pool drain];
+  return 0;
+}
+
+int CreateConnection_After (eio_req *req) {
+  HandleScope scope;
+  ev_unref(EV_DEFAULT_UC);
+  struct create_connection_request * ccr = (struct create_connection_request *)req->data;
+  Local<Value> argv[2];
+  argv[0] = Local<Value>::New(Null());
+
+  // We need to create an instance of the JS 'Application' class
+  Local<Object> app = Application::constructor_template->GetFunction()->NewInstance();
+  Application* it = ObjectWrap::Unwrap<Application>(app);
+  it->iTunesRef = ccr->iTunesRef;
+  argv[1] = app;
+
+  //argv[2] = String::New(sr->name);
+  TryCatch try_catch;
+  ccr->cb->Call(Context::GetCurrent()->Global(), 2, argv);
+  if (try_catch.HasCaught()) {
+    FatalException(try_catch);
+  }
+  ccr->cb.Dispose();
+  free(ccr);
+  return 0;
 }
 
 } // namespace node_iTunes
