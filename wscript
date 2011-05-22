@@ -10,4 +10,4 @@ def build(bld):
   obj.cxxflags = ["-g", "-D_FILE_OFFSET_BITS=64", "-D_LARGEFILE_SOURCE", "-Wall", "-lobjc", "-ObjC++"]
   obj.framework = ['Foundation', 'ScriptingBridge']
   obj.target = "bindings"
-  obj.source = ["src/bindings.cc", "src/node_iTunesApplication.cc"]
+  obj.source = ["src/bindings.cc", "src/Application.cc"]
