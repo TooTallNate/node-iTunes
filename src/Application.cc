@@ -170,12 +170,15 @@ int CreateConnection_Do (eio_req *req) {
       NSString* pwString = [NSString stringWithCString: ((const char*)ccr->password) encoding: NSUTF8StringEncoding ];
       urlStr = [urlStr stringByAppendingString: [pwString stringByAddingPercentEscapesUsingEncoding: NSASCIIStringEncoding ]];
       urlStr = [urlStr stringByAppendingString: @"@" ];
+      free(ccr->password);
+      free(ccr->username);
     }
     urlStr = [urlStr stringByAppendingString: [NSString stringWithCString: ((const char*)ccr->host) encoding: NSUTF8StringEncoding ]];
     urlStr = [urlStr stringByAppendingString: @"/iTunes" ];
     //NSLog(@"%@", urlStr);
     NSURL* url = [NSURL URLWithString: urlStr];
     ccr->iTunesRef = [SBApplication applicationWithURL: url];
+    free(ccr->host);
   } else {
     // If no 'options' object was provided, then simply connect to the local
     // iTunes installation. No credentials are required for this mode.
