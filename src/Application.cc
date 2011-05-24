@@ -37,7 +37,8 @@ void Application::Init(v8::Handle<Object> target) {
   t->InstanceTemplate()->SetInternalFieldCount(1);
 
   //NODE_SET_PROTOTYPE_METHOD(t, "runSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "quitSync", GetVolumeSync);
+  NODE_SET_PROTOTYPE_METHOD(t, "isRunningSync", IsRunningSync);
+  NODE_SET_PROTOTYPE_METHOD(t, "quitSync", QuitSync);
   //NODE_SET_PROTOTYPE_METHOD(t, "addSync", GetVolumeSync);
   //NODE_SET_PROTOTYPE_METHOD(t, "backTrackSync", GetVolumeSync);
   //NODE_SET_PROTOTYPE_METHOD(t, "convertSync", GetVolumeSync);
@@ -84,6 +85,22 @@ v8::Handle<Value> Application::New(const Arguments& args) {
   Application* hw = new Application();
   hw->Wrap(args.This());
   return args.This();
+}
+
+v8::Handle<Value> Application::IsRunningSync(const Arguments& args) {
+  HandleScope scope;
+  Application* it = ObjectWrap::Unwrap<Application>(args.This());
+  iTunesApplication* iTunes = it->iTunesRef;
+  v8::Handle<v8::Boolean> result = v8::Boolean::New([iTunes isRunning]);
+  return scope.Close(result);
+}
+
+v8::Handle<Value> Application::QuitSync(const Arguments& args) {
+  HandleScope scope;
+  Application* it = ObjectWrap::Unwrap<Application>(args.This());
+  iTunesApplication* iTunes = it->iTunesRef;
+  [iTunes quit];
+  return Undefined();
 }
 
 v8::Handle<Value> Application::GetVolumeSync(const Arguments& args) {

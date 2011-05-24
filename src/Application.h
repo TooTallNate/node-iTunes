@@ -27,9 +27,10 @@ public:
   static void Init(v8::Handle<v8::Object>);
 
   static v8::Handle<v8::Value> New(const v8::Arguments&);
-  /*static v8::Handle<v8::Value> RunSync(const v8::Arguments&);
   static v8::Handle<v8::Value> QuitSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> AddSync(const v8::Arguments&);
+  //static v8::Handle<v8::Value> RunSync(const v8::Arguments&);
+  static v8::Handle<v8::Value> IsRunningSync(const v8::Arguments&);
+  /*static v8::Handle<v8::Value> AddSync(const v8::Arguments&);
   static v8::Handle<v8::Value> BackTrackSync(const v8::Arguments&);
   static v8::Handle<v8::Value> ConvertSync(const v8::Arguments&);
   static v8::Handle<v8::Value> FastForwardSync(const v8::Arguments&);
