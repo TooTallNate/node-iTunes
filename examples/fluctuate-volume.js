@@ -1,4 +1,4 @@
-var iTunes = require('./');
+var iTunes = require('../');
 
 iTunes.createConnection(function(err, itunes) {
   var i = itunes.getVolumeSync();
