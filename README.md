@@ -4,7 +4,7 @@ node-iTunes
 
 
 This module exposes iTunes' [ScriptingBridge][] interface to node. This allows
-for controling almost _every_ aspect of your library programmatically with
+for controlling almost _every_ aspect of your library programmatically with
 node!
 
 You can even connect to a _remote_ iTunes instance that's somewhere on your
