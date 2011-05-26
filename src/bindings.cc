@@ -3,6 +3,7 @@
 
 #import "Application.h"
 #import "Item.h"
+#import "Track.h"
 #import "iTunes.h"
 
 using namespace node;
@@ -14,6 +15,7 @@ extern "C" void init(v8::Handle<Object> target) {
   HandleScope scope;
   Application::Init(target);
   Item::Init(target);
+  Track::Init(target);
 }
 
 } // namespace node_iTunes

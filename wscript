@@ -11,4 +11,5 @@ def build(bld):
   obj.ldflags = ["-mmacosx-version-min=10.4", "-lobjc"]
   obj.framework = ['Foundation', 'ScriptingBridge']
   obj.target = "bindings"
-  obj.source = ["src/bindings.cc", "src/Application.cc", "src/Item.cc"]
+  obj.source = ["src/bindings.cc", "src/Application.cc", "src/Item.cc",
+      "src/Track.cc"]
