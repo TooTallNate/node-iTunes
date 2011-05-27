@@ -14,6 +14,7 @@ public:
 
   static void Init(v8::Handle<v8::Object>);
 
+  static v8::Handle<v8::Value> WrapInstance(iTunesTrack* track);
   static v8::Handle<v8::Value> New(const v8::Arguments&);
 
   //static v8::Handle<v8::Value> GetContainerSync(const v8::Arguments&);

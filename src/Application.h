@@ -1,5 +1,6 @@
 #import <node.h>
 #import <v8.h>
+#import "Track.h"
 #import "iTunes.h"
 
 namespace node_iTunes {
@@ -48,6 +49,8 @@ public:
   static v8::Handle<v8::Value> UpdateAllPodcastsSync(const v8::Arguments&);
   static v8::Handle<v8::Value> UpdatePodcastSync(const v8::Arguments&);
   static v8::Handle<v8::Value> OpenLocationSync(const v8::Arguments&);*/
+  static v8::Handle<v8::Value> GetCurrentTrackSync(const v8::Arguments&);
+  static v8::Handle<v8::Value> GetSelectionSync(const v8::Arguments&);
 
   static v8::Handle<v8::Value> GetVolumeSync(const v8::Arguments&);
   static v8::Handle<v8::Value> SetVolumeSync(const v8::Arguments&);

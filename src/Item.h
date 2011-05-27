@@ -5,10 +5,8 @@
 namespace node_iTunes {
 
 class Item : public node::ObjectWrap {
-protected:
-  iTunesItem* item;
-
 public:
+  iTunesItem* itemRef;
   static v8::Persistent<v8::FunctionTemplate> constructor_template;
 
   Item();

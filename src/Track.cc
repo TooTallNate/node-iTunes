@@ -27,6 +27,18 @@ void Track::Init(v8::Handle<Object> target) {
   target->Set(TRACK_CLASS_SYMBOL, constructor_template->GetFunction());
 }
 
+// Convenience function that takes an iTunesTrack instance (or any subclass)
+// and wraps it up into the proper JS class type, and returns it.
+v8::Handle<Value> Track::WrapInstance(iTunesTrack* track) {
+  HandleScope scope;
+  NSLog(@"Class: %@", [track class]);
+  Local<Object> jsTrack = Track::constructor_template->GetFunction()->NewInstance();
+  Track* t = ObjectWrap::Unwrap<Track>(jsTrack);
+  t->itemRef = track;
+  return scope.Close(jsTrack);
+}
+
+// Creates a new JS "Track" instance.
 v8::Handle<Value> Track::New(const Arguments& args) {
   HandleScope scope;
 

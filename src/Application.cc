@@ -57,6 +57,8 @@ void Application::Init(v8::Handle<Object> target) {
   //NODE_SET_PROTOTYPE_METHOD(t, "updateAllPodcastsSync", GetVolumeSync);
   //NODE_SET_PROTOTYPE_METHOD(t, "updatePodcastSync", GetVolumeSync);
   //NODE_SET_PROTOTYPE_METHOD(t, "openLocationSync", GetVolumeSync);
+  NODE_SET_PROTOTYPE_METHOD(t, "getCurrentTrackSync", GetCurrentTrackSync);
+  NODE_SET_PROTOTYPE_METHOD(t, "getSelectionSync", GetSelectionSync);
   NODE_SET_PROTOTYPE_METHOD(t, "getVolumeSync", GetVolumeSync);
   NODE_SET_PROTOTYPE_METHOD(t, "setVolumeSync", SetVolumeSync);
 
@@ -100,6 +102,25 @@ v8::Handle<Value> Application::QuitSync(const Arguments& args) {
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
   iTunesApplication* iTunes = it->iTunesRef;
   [iTunes quit];
+  return Undefined();
+}
+
+v8::Handle<Value> Application::GetCurrentTrackSync(const Arguments& args) {
+  HandleScope scope;
+  Application* it = ObjectWrap::Unwrap<Application>(args.This());
+  iTunesApplication* iTunes = it->iTunesRef;
+  iTunesTrack* currentTrack = [[iTunes currentTrack] get];
+  v8::Handle<Value> jsTrack = Track::WrapInstance(currentTrack);
+  return scope.Close(jsTrack);
+}
+
+v8::Handle<Value> Application::GetSelectionSync(const Arguments& args) {
+  HandleScope scope;
+  Application* it = ObjectWrap::Unwrap<Application>(args.This());
+  iTunesApplication* iTunes = it->iTunesRef;
+  //SBElementArray* selection = [iTunes selection];
+  NSArray* selection = [[iTunes selection] get];
+  //Local<Object> Track::WrapInstance
   return Undefined();
 }
 
