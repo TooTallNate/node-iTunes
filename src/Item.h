@@ -1,13 +1,15 @@
 #import <node.h>
 #import <v8.h>
+#import "js_constructors.h"
 #import "iTunes.h"
 
 namespace node_iTunes {
 
 class Item : public node::ObjectWrap {
 public:
+
+  // The reference that this JS instance is representing
   iTunesItem* itemRef;
-  static v8::Persistent<v8::FunctionTemplate> constructor_template;
 
   Item();
   ~Item();

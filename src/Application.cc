@@ -1,5 +1,4 @@
 #include "Application.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -15,7 +14,7 @@ static Persistent<String> PASSWORD_SYMBOL;
 
 static Persistent<Object> NEW_CHECKER;
 
-Persistent<FunctionTemplate> Application::constructor_template;
+//Persistent<FunctionTemplate> Application::constructor_template;
 
 void Application::Init(v8::Handle<Object> target) {
   HandleScope scope;
@@ -32,8 +31,8 @@ void Application::Init(v8::Handle<Object> target) {
 
   // Set up the 'Application' constructor template
   Local<FunctionTemplate> t = FunctionTemplate::New(New);
-  constructor_template = Persistent<FunctionTemplate>::New(t);
-  constructor_template->SetClassName(APPLICATION_CLASS_SYMBOL);
+  application_constructor_template = Persistent<FunctionTemplate>::New(t);
+  application_constructor_template->SetClassName(APPLICATION_CLASS_SYMBOL);
   t->InstanceTemplate()->SetInternalFieldCount(1);
 
   //NODE_SET_PROTOTYPE_METHOD(t, "runSync", GetVolumeSync);
@@ -64,7 +63,7 @@ void Application::Init(v8::Handle<Object> target) {
 
   NODE_SET_METHOD(target, "createConnection", CreateConnection);
 
-  target->Set(APPLICATION_CLASS_SYMBOL, constructor_template->GetFunction());
+  target->Set(APPLICATION_CLASS_SYMBOL, application_constructor_template->GetFunction());
 }
 
 
@@ -236,7 +235,7 @@ int CreateConnection_After (eio_req *req) {
   // We need to create an instance of the JS 'Application' class
   v8::Handle<Value> constructor_args[1];
   constructor_args[0] = NEW_CHECKER;
-  Local<Object> app = Application::constructor_template->GetFunction()->NewInstance(1, constructor_args);
+  Local<Object> app = application_constructor_template->GetFunction()->NewInstance(1, constructor_args);
   Application* it = ObjectWrap::Unwrap<Application>(app);
   it->iTunesRef = ccr->iTunesRef;
   argv[1] = app;

@@ -1,5 +1,6 @@
 #import <node.h>
 #import <v8.h>
+#import "js_constructors.h"
 #import "Track.h"
 #import "iTunes.h"
 
@@ -19,8 +20,6 @@ int CreateConnection_After (eio_req *req);
 class Application : public node::ObjectWrap {
 public:
   iTunesApplication* iTunesRef;
-
-  static v8::Persistent<v8::FunctionTemplate> constructor_template;
 
   Application();
   ~Application();

@@ -7,7 +7,7 @@ namespace node_iTunes {
 
 static Persistent<String> ITEM_CLASS_SYMBOL;
 
-Persistent<FunctionTemplate> Item::constructor_template;
+//Persistent<FunctionTemplate> Item::constructor_template;
 
 void Item::Init(v8::Handle<Object> target) {
   HandleScope scope;
@@ -17,14 +17,14 @@ void Item::Init(v8::Handle<Object> target) {
 
   // Set up the 'Item' base-class constructor template
   Local<FunctionTemplate> t = FunctionTemplate::New(New);
-  constructor_template = Persistent<FunctionTemplate>::New(t);
-  constructor_template->SetClassName(ITEM_CLASS_SYMBOL);
+  item_constructor_template = Persistent<FunctionTemplate>::New(t);
+  item_constructor_template->SetClassName(ITEM_CLASS_SYMBOL);
   t->InstanceTemplate()->SetInternalFieldCount(1);
 
   NODE_SET_PROTOTYPE_METHOD(t, "getNameSync", GetNameSync);
   //NODE_SET_METHOD(target, "createConnection", CreateConnection);
 
-  target->Set(ITEM_CLASS_SYMBOL, constructor_template->GetFunction());
+  target->Set(ITEM_CLASS_SYMBOL, item_constructor_template->GetFunction());
 }
 
 
