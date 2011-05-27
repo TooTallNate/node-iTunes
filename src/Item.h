@@ -16,10 +16,14 @@ public:
 
   static v8::Handle<v8::Value> New(const v8::Arguments&);
 
+  // iTunes Property Getters -> JS Functions
   static v8::Handle<v8::Value> GetContainerSync(const v8::Arguments&);
   static v8::Handle<v8::Value> GetIdSync(const v8::Arguments&);
   static v8::Handle<v8::Value> GetNameSync(const v8::Arguments&);
   static v8::Handle<v8::Value> GetPersistentIdSync(const v8::Arguments&);
+
+  // iTunes Property Setters -> JS Functions
+  static v8::Handle<v8::Value> SetNameSync(const v8::Arguments&);
 
 }; // class Item
 
