@@ -27,7 +27,13 @@ public:
 
   static void Init(v8::Handle<v8::Object>);
 
+  // JS Constructor
   static v8::Handle<v8::Value> New(const v8::Arguments&);
+
+  // The proper way to get an Application instance in JS-land
+  static v8::Handle<v8::Value> CreateConnection(const v8::Arguments&);
+
+  // iTunes Functions -> JS Functions
   static v8::Handle<v8::Value> QuitSync(const v8::Arguments&);
   //static v8::Handle<v8::Value> RunSync(const v8::Arguments&);
   static v8::Handle<v8::Value> IsRunningSync(const v8::Arguments&);
@@ -49,13 +55,14 @@ public:
   static v8::Handle<v8::Value> UpdateAllPodcastsSync(const v8::Arguments&);
   static v8::Handle<v8::Value> UpdatePodcastSync(const v8::Arguments&);
   static v8::Handle<v8::Value> OpenLocationSync(const v8::Arguments&);*/
+
+  // iTunes Property Getters -> JS Functions
   static v8::Handle<v8::Value> GetCurrentTrackSync(const v8::Arguments&);
   static v8::Handle<v8::Value> GetSelectionSync(const v8::Arguments&);
-
   static v8::Handle<v8::Value> GetVolumeSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> SetVolumeSync(const v8::Arguments&);
 
-  static v8::Handle<v8::Value> CreateConnection(const v8::Arguments&);
+  // iTunes Property Setters -> JS Functions
+  static v8::Handle<v8::Value> SetVolumeSync(const v8::Arguments&);
 
 }; // class iTunesApplication
 
