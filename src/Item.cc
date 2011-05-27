@@ -21,7 +21,7 @@ void Item::Init(v8::Handle<Object> target) {
   constructor_template->SetClassName(ITEM_CLASS_SYMBOL);
   t->InstanceTemplate()->SetInternalFieldCount(1);
 
-  //NODE_SET_PROTOTYPE_METHOD(t, "runSync", GetVolumeSync);
+  NODE_SET_PROTOTYPE_METHOD(t, "getNameSync", GetNameSync);
   //NODE_SET_METHOD(target, "createConnection", CreateConnection);
 
   target->Set(ITEM_CLASS_SYMBOL, constructor_template->GetFunction());
@@ -45,15 +45,15 @@ v8::Handle<Value> Item::New(const Arguments& args) {
   return args.This();
 }
 
-/*v8::Handle<Value> Application::IsRunningSync(const Arguments& args) {
+v8::Handle<Value> Item::GetNameSync(const Arguments& args) {
   HandleScope scope;
-  Application* it = ObjectWrap::Unwrap<Application>(args.This());
-  iTunesApplication* iTunes = it->iTunesRef;
-  v8::Handle<v8::Boolean> result = v8::Boolean::New([iTunes isRunning]);
+  Item* it = ObjectWrap::Unwrap<Item>(args.This());
+  iTunesItem* item = it->itemRef;
+  Local<Value> result = String::New([[item name] UTF8String]);
   return scope.Close(result);
 }
 
-v8::Handle<Value> Application::QuitSync(const Arguments& args) {
+/*v8::Handle<Value> Application::QuitSync(const Arguments& args) {
   HandleScope scope;
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
   iTunesApplication* iTunes = it->iTunesRef;
