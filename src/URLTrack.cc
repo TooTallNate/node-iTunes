@@ -21,7 +21,7 @@ void URLTrack::Init(v8::Handle<Object> target) {
   url_track_constructor_template->SetClassName(URL_TRACK_CLASS_SYMBOL);
   t->InstanceTemplate()->SetInternalFieldCount(1);
 
-  //NODE_SET_PROTOTYPE_METHOD(t, "runSync", GetVolumeSync);
+  //NODE_SET_PROTOTYPE_METHOD(t, "run", GetVolume);
   //NODE_SET_METHOD(target, "createConnection", CreateConnection);
 
   target->Set(URL_TRACK_CLASS_SYMBOL, url_track_constructor_template->GetFunction());
@@ -36,7 +36,7 @@ v8::Handle<Value> URLTrack::New(const Arguments& args) {
   return args.This();
 }
 
-/*v8::Handle<Value> Application::IsRunningSync(const Arguments& args) {
+/*v8::Handle<Value> Application::IsRunning(const Arguments& args) {
   HandleScope scope;
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
   iTunesApplication* iTunes = it->iTunesRef;

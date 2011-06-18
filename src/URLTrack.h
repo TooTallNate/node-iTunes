@@ -12,10 +12,10 @@ public:
 
   static v8::Handle<v8::Value> New(const v8::Arguments&);
 
-  //static v8::Handle<v8::Value> GetContainerSync(const v8::Arguments&);
-  //static v8::Handle<v8::Value> GetIdSync(const v8::Arguments&);
-  //static v8::Handle<v8::Value> GetNameSync(const v8::Arguments&);
-  //static v8::Handle<v8::Value> GetPersistentIdSync(const v8::Arguments&);
+  //static v8::Handle<v8::Value> GetContainer(const v8::Arguments&);
+  //static v8::Handle<v8::Value> GetId(const v8::Arguments&);
+  //static v8::Handle<v8::Value> GetName(const v8::Arguments&);
+  //static v8::Handle<v8::Value> GetPersistentId(const v8::Arguments&);
 
 }; // class Track
 

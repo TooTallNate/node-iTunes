@@ -35,31 +35,31 @@ void Application::Init(v8::Handle<Object> target) {
   application_constructor_template->SetClassName(APPLICATION_CLASS_SYMBOL);
   t->InstanceTemplate()->SetInternalFieldCount(1);
 
-  //NODE_SET_PROTOTYPE_METHOD(t, "runSync", GetVolumeSync);
-  NODE_SET_PROTOTYPE_METHOD(t, "isRunningSync", IsRunningSync);
-  NODE_SET_PROTOTYPE_METHOD(t, "quitSync", QuitSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "addSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "backTrackSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "convertSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "fastForwardSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "nextTrackSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "pauseSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "playOnceSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "playpauseSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "previousTrackSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "resumeSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "rewindSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "stopSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "updateSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "ejectSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "subscribeSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "updateAllPodcastsSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "updatePodcastSync", GetVolumeSync);
-  //NODE_SET_PROTOTYPE_METHOD(t, "openLocationSync", GetVolumeSync);
-  NODE_SET_PROTOTYPE_METHOD(t, "getCurrentTrackSync", GetCurrentTrackSync);
-  NODE_SET_PROTOTYPE_METHOD(t, "getSelectionSync", GetSelectionSync);
-  NODE_SET_PROTOTYPE_METHOD(t, "getVolumeSync", GetVolumeSync);
-  NODE_SET_PROTOTYPE_METHOD(t, "setVolumeSync", SetVolumeSync);
+  //NODE_SET_PROTOTYPE_METHOD(t, "run", GetVolume);
+  NODE_SET_PROTOTYPE_METHOD(t, "isRunning", IsRunning);
+  NODE_SET_PROTOTYPE_METHOD(t, "quit", Quit);
+  //NODE_SET_PROTOTYPE_METHOD(t, "add", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "backTrack", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "convert", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "fastForward", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "nextTrack", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "pause", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "playOnce", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "playpause", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "previousTrack", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "resume", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "rewind", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "stop", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "update", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "eject", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "subscribe", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "updateAllPodcasts", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "updatePodcast", GetVolume);
+  //NODE_SET_PROTOTYPE_METHOD(t, "openLocation", GetVolume);
+  NODE_SET_PROTOTYPE_METHOD(t, "getCurrentTrack", GetCurrentTrack);
+  NODE_SET_PROTOTYPE_METHOD(t, "getSelection", GetSelection);
+  NODE_SET_PROTOTYPE_METHOD(t, "getVolume", GetVolume);
+  NODE_SET_PROTOTYPE_METHOD(t, "setVolume", SetVolume);
 
   NODE_SET_METHOD(target, "createConnection", CreateConnection);
 
@@ -88,7 +88,7 @@ v8::Handle<Value> Application::New(const Arguments& args) {
   return args.This();
 }
 
-v8::Handle<Value> Application::IsRunningSync(const Arguments& args) {
+v8::Handle<Value> Application::IsRunning(const Arguments& args) {
   HandleScope scope;
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
   iTunesApplication* iTunes = it->iTunesRef;
@@ -96,7 +96,7 @@ v8::Handle<Value> Application::IsRunningSync(const Arguments& args) {
   return scope.Close(result);
 }
 
-v8::Handle<Value> Application::QuitSync(const Arguments& args) {
+v8::Handle<Value> Application::Quit(const Arguments& args) {
   HandleScope scope;
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
   iTunesApplication* iTunes = it->iTunesRef;
@@ -104,7 +104,7 @@ v8::Handle<Value> Application::QuitSync(const Arguments& args) {
   return Undefined();
 }
 
-v8::Handle<Value> Application::GetCurrentTrackSync(const Arguments& args) {
+v8::Handle<Value> Application::GetCurrentTrack(const Arguments& args) {
   HandleScope scope;
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
   iTunesApplication* iTunes = it->iTunesRef;
@@ -113,7 +113,7 @@ v8::Handle<Value> Application::GetCurrentTrackSync(const Arguments& args) {
   return scope.Close(jsTrack);
 }
 
-v8::Handle<Value> Application::GetSelectionSync(const Arguments& args) {
+v8::Handle<Value> Application::GetSelection(const Arguments& args) {
   HandleScope scope;
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
   iTunesApplication* iTunes = it->iTunesRef;
@@ -123,7 +123,7 @@ v8::Handle<Value> Application::GetSelectionSync(const Arguments& args) {
   return Undefined();
 }
 
-v8::Handle<Value> Application::GetVolumeSync(const Arguments& args) {
+v8::Handle<Value> Application::GetVolume(const Arguments& args) {
   HandleScope scope;
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
   iTunesApplication* iTunes = it->iTunesRef;
@@ -131,7 +131,7 @@ v8::Handle<Value> Application::GetVolumeSync(const Arguments& args) {
   return scope.Close(result);
 }
 
-v8::Handle<Value> Application::SetVolumeSync(const Arguments& args) {
+v8::Handle<Value> Application::SetVolume(const Arguments& args) {
   HandleScope scope;
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
   iTunesApplication* iTunes = it->iTunesRef;

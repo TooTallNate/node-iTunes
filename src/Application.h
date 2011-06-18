@@ -33,35 +33,35 @@ public:
   static v8::Handle<v8::Value> CreateConnection(const v8::Arguments&);
 
   // iTunes Functions -> JS Functions
-  static v8::Handle<v8::Value> QuitSync(const v8::Arguments&);
-  //static v8::Handle<v8::Value> RunSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> IsRunningSync(const v8::Arguments&);
-  /*static v8::Handle<v8::Value> AddSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> BackTrackSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> ConvertSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> FastForwardSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> NextTrackSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> PauseSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> PlayOnceSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> PlayPauseSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> PreviousTrackSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> ResumeSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> RewindSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> StopSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> UpdateSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> EjectSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> SubscribeSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> UpdateAllPodcastsSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> UpdatePodcastSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> OpenLocationSync(const v8::Arguments&);*/
+  static v8::Handle<v8::Value> Quit(const v8::Arguments&);
+  //static v8::Handle<v8::Value> Run(const v8::Arguments&);
+  static v8::Handle<v8::Value> IsRunning(const v8::Arguments&);
+  /*static v8::Handle<v8::Value> Add(const v8::Arguments&);
+  static v8::Handle<v8::Value> BackTrack(const v8::Arguments&);
+  static v8::Handle<v8::Value> Convert(const v8::Arguments&);
+  static v8::Handle<v8::Value> FastForward(const v8::Arguments&);
+  static v8::Handle<v8::Value> NextTrack(const v8::Arguments&);
+  static v8::Handle<v8::Value> Pause(const v8::Arguments&);
+  static v8::Handle<v8::Value> PlayOnce(const v8::Arguments&);
+  static v8::Handle<v8::Value> PlayPause(const v8::Arguments&);
+  static v8::Handle<v8::Value> PreviousTrack(const v8::Arguments&);
+  static v8::Handle<v8::Value> Resume(const v8::Arguments&);
+  static v8::Handle<v8::Value> Rewind(const v8::Arguments&);
+  static v8::Handle<v8::Value> Stop(const v8::Arguments&);
+  static v8::Handle<v8::Value> Update(const v8::Arguments&);
+  static v8::Handle<v8::Value> Eject(const v8::Arguments&);
+  static v8::Handle<v8::Value> Subscribe(const v8::Arguments&);
+  static v8::Handle<v8::Value> UpdateAllPodcasts(const v8::Arguments&);
+  static v8::Handle<v8::Value> UpdatePodcast(const v8::Arguments&);
+  static v8::Handle<v8::Value> OpenLocation(const v8::Arguments&);*/
 
   // iTunes Property Getters -> JS Functions
-  static v8::Handle<v8::Value> GetCurrentTrackSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> GetSelectionSync(const v8::Arguments&);
-  static v8::Handle<v8::Value> GetVolumeSync(const v8::Arguments&);
+  static v8::Handle<v8::Value> GetCurrentTrack(const v8::Arguments&);
+  static v8::Handle<v8::Value> GetSelection(const v8::Arguments&);
+  static v8::Handle<v8::Value> GetVolume(const v8::Arguments&);
 
   // iTunes Property Setters -> JS Functions
-  static v8::Handle<v8::Value> SetVolumeSync(const v8::Arguments&);
+  static v8::Handle<v8::Value> SetVolume(const v8::Arguments&);
 
 }; // class iTunesApplication
 
