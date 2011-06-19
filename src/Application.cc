@@ -185,14 +185,14 @@ v8::Handle<Value> Application::CreateConnection(const Arguments& args) {
   Local<Function> cb = Local<Function>::Cast(args[cbIndex]);
   ccr->cb = Persistent<Function>::New(cb);
 
-  eio_custom(CreateConnection_Do, EIO_PRI_DEFAULT, CreateConnection_After, ccr);
+  eio_custom(Application::EIO_CreateConnection, EIO_PRI_DEFAULT, Application::EIO_AfterCreateConnection, ccr);
   ev_ref(EV_DEFAULT_UC);
   return Undefined();
 }
 
 // Creates the SBApplication instance. This is called on the thread pool since
 // it can block for a long time.
-int CreateConnection_Do (eio_req *req) {
+int Application::EIO_CreateConnection (eio_req *req) {
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
   struct create_connection_request * ccr = (struct create_connection_request *)req->data;
   if (ccr->host != NULL) {
@@ -225,7 +225,7 @@ int CreateConnection_Do (eio_req *req) {
   return 0;
 }
 
-int CreateConnection_After (eio_req *req) {
+int Application::EIO_AfterCreateConnection (eio_req *req) {
   HandleScope scope;
   ev_unref(EV_DEFAULT_UC);
   struct create_connection_request * ccr = (struct create_connection_request *)req->data;

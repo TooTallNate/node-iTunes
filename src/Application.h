@@ -14,8 +14,6 @@ struct create_connection_request {
   iTunesApplication* iTunesRef;
 };
 
-int CreateConnection_Do (eio_req *req);
-int CreateConnection_After (eio_req *req);
 
 class Application : public node::ObjectWrap {
 public:
@@ -62,6 +60,16 @@ public:
 
   // iTunes Property Setters -> JS Functions
   static v8::Handle<v8::Value> SetVolume(const v8::Arguments&);
+
+private:
+  static int EIO_CreateConnection (eio_req *);
+  static int EIO_AfterCreateConnection (eio_req *);
+
+  static int EIO_GetVolume (eio_req *);
+  static int EIO_AfterGetVolume (eio_req *);
+
+  static int EIO_SetVolume (eio_req *);
+  static int EIO_AfterSetVolume (eio_req *);
 
 }; // class iTunesApplication
 

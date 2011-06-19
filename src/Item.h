@@ -35,17 +35,17 @@ public:
   static v8::Handle<v8::Value> SetName(const v8::Arguments&);
 
 private:
-  static int EIO_GetName(eio_req*);
-  static int EIO_AfterGetName(eio_req*);
+  static int EIO_GetName (eio_req *);
+  static int EIO_AfterGetName (eio_req *);
 
-  static int EIO_GetId(eio_req*);
-  static int EIO_AfterGetId(eio_req*);
+  static int EIO_GetId (eio_req *);
+  static int EIO_AfterGetId (eio_req *);
 
-  static int EIO_GetPersistentId(eio_req*);
-  static int EIO_AfterGetPersistentId(eio_req*);
+  static int EIO_GetPersistentId (eio_req *);
+  static int EIO_AfterGetPersistentId (eio_req *);
 
-  static int EIO_GetContainer(eio_req*);
-  static int EIO_AfterGetContainer(eio_req*);
+  static int EIO_GetContainer (eio_req *);
+  static int EIO_AfterGetContainer (eio_req *);
 
 }; // class Item
 
