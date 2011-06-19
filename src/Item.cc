@@ -10,7 +10,6 @@ static Persistent<String> ITEM_CLASS_SYMBOL;
 struct async_request {
   Persistent<Function> callback;
   Persistent<Object> thisRef;
-  Item *item;
   iTunesItem *itemRef;
   void *result;
 };
@@ -55,10 +54,14 @@ v8::Handle<Value> Item::New(const Arguments& args) {
 // GetName ////////////////////////////////////////////////////////////////////////
 v8::Handle<Value> Item::GetName(const Arguments& args) {
   HandleScope scope;
+
+  if (args.Length() < 1) {
+    return ThrowException(Exception::TypeError(String::New("A callback function is required")));
+  }
+
   Item *item = ObjectWrap::Unwrap<Item>(args.This());
 
   async_request *ar = (async_request *)malloc(sizeof(struct async_request));
-  ar->item = item;
   ar->itemRef = item->itemRef;
   Local<Function> cb = Local<Function>::Cast(args[0]);
   ar->callback = Persistent<Function>::New(cb);
@@ -85,8 +88,9 @@ int Item::EIO_AfterGetName (eio_req *req) {
   async_request *ar = (async_request *)req->data;
 
   TryCatch try_catch;
-  Local<Value> argv[2];
-  argv[0] = Local<Value>::New(Null());
+  v8::Handle<Value> argv[2];
+  // TODO: Error Handling
+  argv[0] = Null();
   argv[1] = String::New((const char *)ar->result);
   ar->callback->Call(ar->thisRef, 2, argv);
 

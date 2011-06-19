@@ -6,15 +6,6 @@
 
 namespace node_iTunes {
 
-struct create_connection_request {
-  char* host;
-  char* username;
-  char* password;
-  v8::Persistent<v8::Function> cb;
-  iTunesApplication* iTunesRef;
-};
-
-
 class Application : public node::ObjectWrap {
 public:
   iTunesApplication* iTunesRef;
@@ -64,6 +55,9 @@ public:
 private:
   static int EIO_CreateConnection (eio_req *);
   static int EIO_AfterCreateConnection (eio_req *);
+
+  static int EIO_GetCurrentTrack (eio_req *);
+  static int EIO_AfterGetCurrentTrack (eio_req *);
 
   static int EIO_GetVolume (eio_req *);
   static int EIO_AfterGetVolume (eio_req *);

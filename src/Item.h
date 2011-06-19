@@ -47,6 +47,9 @@ private:
   static int EIO_GetContainer (eio_req *);
   static int EIO_AfterGetContainer (eio_req *);
 
+  static int EIO_SetName (eio_req *);
+  static int EIO_AfterSetName (eio_req *);
+
 }; // class Item
 
 } // namespace node_iTunes
