@@ -8,8 +8,12 @@ function onConnection (err, itunes) {
   if (err) throw err;
 
   console.time('getCurrentTrack');
-  var track = itunes.getCurrentTrackSync();
+  itunes.getCurrentTrack(onTrack);
+}
+
+function onTrack (err, track) {
   console.timeEnd('getCurrentTrack');
+  if (err) throw err;
 
   console.time('getName');
   track.getName(onName);
