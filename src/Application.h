@@ -6,6 +6,11 @@
 
 namespace node_iTunes {
 
+// A note on ScriptingBridge "Thread Safety": Essentially any SBObject needs to
+// only have one thread accessing it at a time. A pthread mutex lock will be
+// required to ensure that only one EIO thread access any given item at a time:
+//   http://developer.apple.com/library/mac/releasenotes/ScriptingAutomation/RN-ScriptingBridge
+
 class Application : public node::ObjectWrap {
 public:
   iTunesApplication* iTunesRef;
