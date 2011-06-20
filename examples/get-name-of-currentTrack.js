@@ -14,6 +14,8 @@ function onConnection (err, itunes) {
 function onTrack (err, track) {
   console.timeEnd('getCurrentTrack');
   if (err) throw err;
+  if (!track)
+    return console.log('There is no track currently playing...');
 
   console.time('getName');
   track.getName(onName);
