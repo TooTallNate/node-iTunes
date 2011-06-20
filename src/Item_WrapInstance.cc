@@ -12,18 +12,22 @@ namespace node_iTunes {
 v8::Handle<Value> Item::WrapInstance(iTunesItem* item) {
   HandleScope scope;
 
-  NSLog(@"%@", item);
+  //NSLog(@"%@", [item persistentID]);
   if (item == nil) {
     return scope.Close(Null());
   }
 
   NSString* className = NSStringFromClass([item class]);
-  NSLog(@"Class: %@", className);
+  //NSLog(@"Class: %@", className);
   Local<Object> jsItem;
   if ([className isEqualToString:@"ITunesURLTrack" ]) {
     jsItem = url_track_constructor_template->GetFunction()->NewInstance();
-  } else {
+  } else if ([className isEqualToString:@"ITunesFileTrack" ]) {
+    jsItem = file_track_constructor_template->GetFunction()->NewInstance();
+  } else if ([className isEqualToString:@"ITunesTrack" ]) {
     jsItem = track_constructor_template->GetFunction()->NewInstance();
+  } else {
+    jsItem = item_constructor_template->GetFunction()->NewInstance();
   }
   Item* itemWrap = ObjectWrap::Unwrap<Item>(jsItem);
   itemWrap->itemRef = item;
