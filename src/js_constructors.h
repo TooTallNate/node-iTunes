@@ -11,6 +11,7 @@ namespace node_iTunes {
   extern v8::Persistent<v8::FunctionTemplate> track_constructor_template;
   extern v8::Persistent<v8::FunctionTemplate> file_track_constructor_template;
   extern v8::Persistent<v8::FunctionTemplate> url_track_constructor_template;
+  extern v8::Persistent<v8::FunctionTemplate> playlist_constructor_template;
   extern v8::Persistent<v8::FunctionTemplate> source_constructor_template;
 
 } // namespace node_iTunes

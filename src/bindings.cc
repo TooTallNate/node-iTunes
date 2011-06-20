@@ -6,6 +6,7 @@
 #import "Track.h"
 #import "FileTrack.h"
 #import "URLTrack.h"
+#import "Playlist.h"
 #import "Source.h"
 #import "iTunes.h"
 
@@ -19,6 +20,7 @@ v8::Persistent<v8::FunctionTemplate> item_constructor_template;
 v8::Persistent<v8::FunctionTemplate> track_constructor_template;
 v8::Persistent<v8::FunctionTemplate> file_track_constructor_template;
 v8::Persistent<v8::FunctionTemplate> url_track_constructor_template;
+v8::Persistent<v8::FunctionTemplate> playlist_constructor_template;
 v8::Persistent<v8::FunctionTemplate> source_constructor_template;
 
 extern "C" void init(v8::Handle<Object> target) {
@@ -28,6 +30,7 @@ extern "C" void init(v8::Handle<Object> target) {
   Track::Init(target);
   FileTrack::Init(target);
   URLTrack::Init(target);
+  Playlist::Init(target);
   Source::Init(target);
 }
 

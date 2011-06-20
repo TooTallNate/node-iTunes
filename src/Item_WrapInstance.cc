@@ -26,6 +26,8 @@ v8::Handle<Value> Item::WrapInstance(iTunesItem* item) {
     jsItem = file_track_constructor_template->GetFunction()->NewInstance();
   } else if ([className isEqualToString:@"ITunesTrack" ]) {
     jsItem = track_constructor_template->GetFunction()->NewInstance();
+  } else if ([className isEqualToString:@"ITunesPlaylist" ]) {
+    jsItem = playlist_constructor_template->GetFunction()->NewInstance();
   } else if ([className isEqualToString:@"ITunesSource" ]) {
     jsItem = source_constructor_template->GetFunction()->NewInstance();
   } else {
