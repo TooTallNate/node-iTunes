@@ -160,7 +160,7 @@ int Application::EIO_AfterGetCurrentTrack(eio_req *req) {
   v8::Handle<Value> argv[2];
   // TODO: Error Handling
   argv[0] = Null();
-  argv[1] = Track::WrapInstance((iTunesTrack *)ar->result);
+  argv[1] = Item::WrapInstance((iTunesItem *)ar->result);
   ar->callback->Call(ar->thisRef, 2, argv);
 
   if (try_catch.HasCaught()) {

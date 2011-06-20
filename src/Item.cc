@@ -14,8 +14,6 @@ struct async_request {
   void *result;
 };
 
-//Persistent<FunctionTemplate> Item::constructor_template;
-
 void Item::Init(v8::Handle<Object> target) {
   HandleScope scope;
 
@@ -29,18 +27,23 @@ void Item::Init(v8::Handle<Object> target) {
   t->InstanceTemplate()->SetInternalFieldCount(1);
 
   NODE_SET_PROTOTYPE_METHOD(t, "getName", GetName);
-  //NODE_SET_METHOD(target, "createConnection", CreateConnection);
+  //NODE_SET_PROTOTYPE_METHOD(t, "setName", GetName);
 
   target->Set(ITEM_CLASS_SYMBOL, item_constructor_template->GetFunction());
 }
 
 
+// C++ Constructor/Destructor ////////////////////////////////////////////////
 Item::Item() {
 }
 
 Item::~Item() {
+  if (itemRef) {
+    [itemRef release];
+  }
 }
 
+// JavaScript Constructor/////////////////////////////////////////////////////
 v8::Handle<Value> Item::New(const Arguments& args) {
   HandleScope scope;
   //if (args.Length() != 1 || !NEW_CHECKER->StrictEquals(args[0]->ToObject())) {
@@ -51,7 +54,7 @@ v8::Handle<Value> Item::New(const Arguments& args) {
   return args.This();
 }
 
-// GetName ////////////////////////////////////////////////////////////////////////
+// GetName ///////////////////////////////////////////////////////////////////
 v8::Handle<Value> Item::GetName(const Arguments& args) {
   HandleScope scope;
 
@@ -77,7 +80,14 @@ int Item::EIO_GetName (eio_req *req) {
   async_request *ar = (async_request *)req->data;
   // TODO: Find a way around using an autorelease pool on the thread pool
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  ar->result = (void *)[[ar->itemRef name] UTF8String];
+  NSString *str = [ar->itemRef name];
+  if (str) {
+    [str retain];
+    ar->result = (void *)[str UTF8String];
+  } else {
+    NSError *error = [ar->itemRef lastError];
+    NSLog(@"Got Error: %@", error);
+  }
   [pool drain];
   return 0;
 }

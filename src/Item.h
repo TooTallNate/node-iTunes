@@ -23,6 +23,7 @@ public:
 
   static void Init(v8::Handle<v8::Object>);
 
+  static v8::Handle<v8::Value> WrapInstance(iTunesItem* track);
   static v8::Handle<v8::Value> New(const v8::Arguments&);
 
   // iTunes Property Getters -> JS Functions
