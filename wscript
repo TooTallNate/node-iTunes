@@ -12,4 +12,4 @@ def build(bld):
   obj.framework = ['Foundation', 'AppKit', 'ScriptingBridge']
   obj.target = "bindings"
   obj.source = ["src/bindings.cc", "src/Application.cc", "src/Item.cc",
-      "src/Track.cc", "src/URLTrack.cc"]
+      "src/Item_WrapInstance.cc", "src/Track.cc", "src/URLTrack.cc"]
