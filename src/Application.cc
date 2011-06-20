@@ -1,4 +1,5 @@
 #include "Application.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -27,6 +28,7 @@ struct async_request {
   Persistent<Object> thisRef;
   iTunesApplication *iTunesRef;
   void *result;
+  pthread_mutex_t *mutex;
 };
 
 //Persistent<FunctionTemplate> Application::constructor_template;
@@ -83,6 +85,10 @@ void Application::Init(v8::Handle<Object> target) {
 
 
 Application::Application() {
+  int err = pthread_mutex_init(&mutex, NULL);
+  if (err) {
+    printf("Got Error! %d", err);
+  }
 }
 
 Application::~Application() {
@@ -90,6 +96,10 @@ Application::~Application() {
     [iTunesRef release];
   }
   iTunesRef = nil;
+  int err = pthread_mutex_destroy(&mutex);
+  if (err) {
+    printf("Got Error! %d", err);
+  }
 }
 
 v8::Handle<Value> Application::New(const Arguments& args) {
@@ -134,6 +144,7 @@ v8::Handle<Value> Application::GetCurrentTrack(const Arguments& args) {
   Local<Function> cb = Local<Function>::Cast(args[0]);
   ar->callback = Persistent<Function>::New(cb);
   ar->thisRef = Persistent<Object>::New(args.This());
+  ar->mutex = &it->mutex;
 
   eio_custom(EIO_GetCurrentTrack, EIO_PRI_DEFAULT, EIO_AfterGetCurrentTrack, ar);
   ev_ref(EV_DEFAULT_UC);
@@ -144,9 +155,11 @@ v8::Handle<Value> Application::GetCurrentTrack(const Arguments& args) {
 int Application::EIO_GetCurrentTrack(eio_req *req) {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   async_request *ar = (async_request *)req->data;
+  pthread_mutex_lock( ar->mutex );
   iTunesTrack *track = [[ar->iTunesRef currentTrack] get];
   [track retain];
   ar->result = (void *)track;
+  pthread_mutex_unlock( ar->mutex );
   [pool drain];
   return 0;
 }
