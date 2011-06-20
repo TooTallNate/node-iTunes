@@ -1,3 +1,4 @@
+#include <pthread.h>
 #import <node.h>
 #import <v8.h>
 #import "js_constructors.h"
@@ -34,6 +35,9 @@ public:
 
   // iTunes Property Setters -> JS Functions
   static v8::Handle<v8::Value> SetName(const v8::Arguments&);
+
+protected:
+  pthread_mutex_t mutex;
 
 private:
   static int EIO_GetName (eio_req *);

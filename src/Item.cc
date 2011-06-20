@@ -12,6 +12,7 @@ struct async_request {
   Persistent<Object> thisRef;
   iTunesItem *itemRef;
   void *result;
+  pthread_mutex_t *mutex;
 };
 
 void Item::Init(v8::Handle<Object> target) {
@@ -35,12 +36,14 @@ void Item::Init(v8::Handle<Object> target) {
 
 // C++ Constructor/Destructor ////////////////////////////////////////////////
 Item::Item() {
+  pthread_mutex_init(&mutex, NULL);
 }
 
 Item::~Item() {
   if (itemRef) {
     [itemRef release];
   }
+  pthread_mutex_destroy(&mutex);
 }
 
 // JavaScript Constructor/////////////////////////////////////////////////////
@@ -69,6 +72,7 @@ v8::Handle<Value> Item::GetName(const Arguments& args) {
   Local<Function> cb = Local<Function>::Cast(args[0]);
   ar->callback = Persistent<Function>::New(cb);
   ar->thisRef = Persistent<Object>::New(args.This());
+  ar->mutex = &item->mutex;
 
   eio_custom(EIO_GetName, EIO_PRI_DEFAULT, EIO_AfterGetName, ar);
   ev_ref(EV_DEFAULT_UC);
@@ -80,6 +84,7 @@ int Item::EIO_GetName (eio_req *req) {
   async_request *ar = (async_request *)req->data;
   // TODO: Find a way around using an autorelease pool on the thread pool
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  pthread_mutex_lock( ar->mutex );
   NSString *str = [ar->itemRef name];
   if (str) {
     [str retain];
@@ -88,6 +93,7 @@ int Item::EIO_GetName (eio_req *req) {
     NSError *error = [ar->itemRef lastError];
     NSLog(@"Got Error: %@", error);
   }
+  pthread_mutex_unlock( ar->mutex );
   [pool drain];
   return 0;
 }
