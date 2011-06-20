@@ -28,6 +28,7 @@ struct async_request {
   Persistent<Object> thisRef;
   iTunesApplication *iTunesRef;
   void *result;
+  char *id;
   pthread_mutex_t *mutex;
 };
 
@@ -159,6 +160,7 @@ int Application::EIO_GetCurrentTrack(eio_req *req) {
   iTunesTrack *track = [[ar->iTunesRef currentTrack] get];
   [track retain];
   ar->result = (void *)track;
+  ar->id = (char *)[[track persistentID] UTF8String];
   pthread_mutex_unlock( ar->mutex );
   [pool drain];
   return 0;
@@ -173,7 +175,7 @@ int Application::EIO_AfterGetCurrentTrack(eio_req *req) {
   v8::Handle<Value> argv[2];
   // TODO: Error Handling
   argv[0] = Null();
-  argv[1] = Item::WrapInstance((iTunesItem *)ar->result);
+  argv[1] = Item::WrapInstance((iTunesItem *)ar->result, ar->id);
   ar->callback->Call(ar->thisRef, 2, argv);
 
   if (try_catch.HasCaught()) {
