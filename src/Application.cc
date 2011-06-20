@@ -188,10 +188,53 @@ v8::Handle<Value> Application::GetSelection(const Arguments& args) {
 // GetVolume //////////////////////////////////////////////////////////////////
 v8::Handle<Value> Application::GetVolume(const Arguments& args) {
   HandleScope scope;
+
+  if (args.Length() < 1) {
+    return ThrowException(Exception::TypeError(String::New("A callback function is required")));
+  }
+
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
-  iTunesApplication* iTunes = it->iTunesRef;
-  Local<Integer> result = Integer::New([iTunes soundVolume]);
-  return scope.Close(result);
+
+  async_request *ar = (async_request *)malloc(sizeof(struct async_request));
+  ar->iTunesRef = it->iTunesRef;
+  Local<Function> cb = Local<Function>::Cast(args[0]);
+  ar->callback = Persistent<Function>::New(cb);
+  ar->thisRef = Persistent<Object>::New(args.This());
+
+  eio_custom(EIO_GetVolume, EIO_PRI_DEFAULT, EIO_AfterGetVolume, ar);
+  ev_ref(EV_DEFAULT_UC);
+  return scope.Close(Undefined());
+}
+
+int Application::EIO_GetVolume(eio_req *req) {
+  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+  async_request *ar = (async_request *)req->data;
+  NSInteger vol = [ar->iTunesRef soundVolume];
+  req->result = vol;
+  [pool drain];
+  return 0;
+}
+
+int Application::EIO_AfterGetVolume(eio_req *req) {
+  HandleScope scope;
+  ev_unref(EV_DEFAULT_UC);
+  async_request *ar = (async_request *)req->data;
+
+  TryCatch try_catch;
+  v8::Handle<Value> argv[2];
+  // TODO: Error Handling
+  argv[0] = Null();
+  argv[1] = Integer::New(req->result);
+  ar->callback->Call(ar->thisRef, 2, argv);
+
+  if (try_catch.HasCaught()) {
+    FatalException(try_catch);
+  }
+
+  ar->callback.Dispose();
+  ar->thisRef.Dispose();
+  free(ar);
+  return 0;
 }
 
 // SetVolume //////////////////////////////////////////////////////////////////
