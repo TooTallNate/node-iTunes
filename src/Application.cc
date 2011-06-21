@@ -1,4 +1,5 @@
 #include "Application.h"
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -157,6 +158,7 @@ int Application::EIO_GetCurrentTrack(eio_req *req) {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   async_request *ar = (async_request *)req->data;
   pthread_mutex_lock( ar->mutex );
+  usleep(10 * 1000);
   iTunesTrack *track = [[ar->iTunesRef currentTrack] get];
   [track retain];
   ar->result = (void *)track;

@@ -1,4 +1,5 @@
 #include "Item.h"
+#include <unistd.h>
 
 using namespace node;
 using namespace v8;
@@ -85,6 +86,7 @@ int Item::EIO_GetName (eio_req *req) {
   // TODO: Find a way around using an autorelease pool on the thread pool
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   pthread_mutex_lock( ar->mutex );
+  usleep(10 * 1000);
   NSString *str = [ar->itemRef name];
   if (str) {
     [str retain];
