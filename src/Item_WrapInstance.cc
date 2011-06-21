@@ -10,8 +10,7 @@ namespace node_iTunes {
 // Object Cache. If an iTunesItem is wrapped that has the same 'persistentID'
 // as another iTunesItem that's already been wrapped, then they're the same
 // item, and the same JS Object instance should be returned.
-typedef std::map<std::string, v8::Handle<Value> > CacheMap;
-static CacheMap cache;
+static std::map<std::string, v8::Handle<Value> > cache;
 
 // Convenience function that takes an iTunesItem instance (or any subclass)
 // and wraps it up into the proper JS class type, and returns it.
@@ -25,12 +24,11 @@ v8::Handle<Value> Item::WrapInstance(iTunesItem* item, char *id) {
 
   // Lookup the 'id' in the ObjectCache
   std::string idStr((const char *)id);
-  CacheMap::iterator iter = cache.find(idStr);
 
-  if (iter != cache.end()) {
+  if (cache.count(idStr) > 0) {
     // if we got in here, then the iTunesItem already has a JS wrapper instance
     // created for it. We should return the same instance.
-    v8::Handle<Value> val = iter->second;
+    v8::Handle<Value> val = cache[idStr];
     return scope.Close(val);
   }
 
@@ -56,7 +54,7 @@ v8::Handle<Value> Item::WrapInstance(iTunesItem* item, char *id) {
   // ObjectCache. If this same iTunesItem is gotten again through another API
   // call, then this same JS object will be returned.
   Persistent<Value> perItem = Persistent<Value>::New(jsItem);
-  cache.insert(std::pair<std::string, v8::Handle<Value> >(idStr, perItem));
+  cache[idStr] = perItem;
   return scope.Close(perItem);
 }
 
