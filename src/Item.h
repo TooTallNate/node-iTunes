@@ -36,6 +36,9 @@ public:
   // iTunes Property Setters -> JS Functions
   static v8::Handle<v8::Value> SetName(const v8::Arguments&);
 
+  // 'toString()' override
+  static v8::Handle<v8::Value> ToString(const v8::Arguments&);
+
 protected:
   pthread_mutex_t mutex;
 

@@ -31,6 +31,11 @@ void Item::Init(v8::Handle<Object> target) {
   NODE_SET_PROTOTYPE_METHOD(t, "getName", GetName);
   //NODE_SET_PROTOTYPE_METHOD(t, "setName", GetName);
 
+  // The 'toString()' function uses sync I/O to get iTunes' stringified
+  // version. The thought is that it's helpful for debugging/REPL, and probably
+  // won't be used in production for anything.
+  NODE_SET_PROTOTYPE_METHOD(t, "toString", ToString);
+
   target->Set(ITEM_CLASS_SYMBOL, item_constructor_template->GetFunction());
 }
 
@@ -56,6 +61,14 @@ v8::Handle<Value> Item::New(const Arguments& args) {
   Item* item = new Item();
   item->Wrap(args.This());
   return args.This();
+}
+
+// ToString //////////////////////////////////////////////////////////////////
+v8::Handle<Value> Item::ToString(const Arguments& args) {
+  HandleScope scope;
+  Item *item = ObjectWrap::Unwrap<Item>(args.This());
+  Local<String> str = String::New([[item->itemRef description] UTF8String]);
+  return scope.Close(str);
 }
 
 // GetName ///////////////////////////////////////////////////////////////////
