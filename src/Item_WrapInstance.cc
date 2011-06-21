@@ -12,6 +12,15 @@ namespace node_iTunes {
 // item, and the same JS Object instance should be returned.
 static std::map<std::string, v8::Handle<Value> > cache;
 
+// This callback function is called on any of the iTunesItem Persistent handles
+// when there are no more references to the wrapper and it is about to be GC'd.
+void weakItemCacheCallback(Persistent<Value> object, void *parameter) {
+  std::string id((const char *)parameter);
+  cache.erase(id);
+  object.Dispose();
+  object.Clear();
+}
+
 // Convenience function that takes an iTunesItem instance (or any subclass)
 // and wraps it up into the proper JS class type, and returns it.
 v8::Handle<Value> Item::WrapInstance(iTunesItem* item, char *id) {
@@ -54,6 +63,7 @@ v8::Handle<Value> Item::WrapInstance(iTunesItem* item, char *id) {
   // ObjectCache. If this same iTunesItem is gotten again through another API
   // call, then this same JS object will be returned.
   Persistent<Value> perItem = Persistent<Value>::New(jsItem);
+  perItem.MakeWeak((void *)idStr.c_str(), weakItemCacheCallback);
   cache[idStr] = perItem;
   return scope.Close(perItem);
 }
