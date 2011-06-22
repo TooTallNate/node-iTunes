@@ -68,6 +68,9 @@ private:
   static int EIO_CurrentTrack (eio_req *);
   static int EIO_AfterCurrentTrack (eio_req *);
 
+  static int EIO_Selection (eio_req *);
+  static int EIO_AfterSelection (eio_req *);
+
   static int EIO_Volume (eio_req *);
   static int EIO_AfterVolume (eio_req *);
 

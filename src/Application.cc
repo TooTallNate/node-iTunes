@@ -176,13 +176,38 @@ int Application::EIO_AfterCurrentTrack(eio_req *req) {
 // Readonly
 v8::Handle<Value> Application::Selection(const Arguments& args) {
   HandleScope scope;
-  //Application* it = ObjectWrap::Unwrap<Application>(args.This());
-  //iTunesApplication* iTunes = it->itemRef;
-  //SBElementArray* selection = [iTunes selection];
-  //NSArray* selection = [[iTunes selection] get];
-  //Local<Object> Track::WrapInstance
-  return Undefined();
+  REQUIRE_CALLBACK_ARG;
+  INIT(Application);
+  GET_CALLBACK;
+  BEGIN_ASYNC(EIO_Selection, EIO_AfterSelection);
 }
+
+int Application::EIO_Selection(eio_req *req) {
+  INIT_EIO_FUNC;
+  NSArray *selectionGet = [[ar->itemRef selection] get];
+  [selectionGet retain];
+  ar->result = selectionGet;
+  FINISH_EIO_FUNC;
+}
+
+int Application::EIO_AfterSelection(eio_req *req) {
+  INIT_AFTER_FUNC;
+  // TODO: Error Handling
+  argv[0] = Null();
+  NSArray *selection = (NSArray *)ar->result;
+  Local<Array> resultArray = Array::New([selection count]);
+  iTunesItem *item;
+  for (NSUInteger i = 0; i < [selection count]; i++) {
+    item = [selection objectAtIndex: i];
+    // TODO: FIX THIS! Doing I/O off of the thread pool!!! Need to create
+    // a struct to hold the iTunesItem* as well as the char* persistentID. Then
+    // pass that instead of the NSArray*.
+    resultArray->Set(Integer::New(i), Item::WrapInstance(item, (char *)[[item persistentID] UTF8String]));
+  }
+  argv[1] = resultArray;
+  FINISH_AFTER_FUNC;
+}
+
 
 // Volume /////////////////////////////////////////////////////////////////////
 v8::Handle<Value> Application::Volume(const Arguments& args) {
