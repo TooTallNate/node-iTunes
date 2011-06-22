@@ -17,7 +17,7 @@
 
 
 #define GET_CALLBACK     \
-  Local<Function> cb = Local<Function>::Cast(args[0]);            \
+  Local<Function> cb = Local<Function>::Cast(args[args.Length() - 1]);            \
   ar->callback = Persistent<Function>::New(cb);                    \
   ar->thisRef = Persistent<Object>::New(args.This());
 
