@@ -10,9 +10,9 @@ var iTunes = require('../')
 
 iTunes.createConnection(function (err, conn) {
   if (err) throw err;
-  conn.getCurrentTrack(onTrack);
+  conn.currentTrack(onTrack);
   numCbExpected++;
-  conn.getCurrentTrack(onTrack);
+  conn.currentTrack(onTrack);
   numCbExpected++;
 });
 
