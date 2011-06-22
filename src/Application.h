@@ -55,6 +55,9 @@ public:
   static v8::Handle<v8::Value> Selection(const v8::Arguments&);
   static v8::Handle<v8::Value> Volume(const v8::Arguments&);
 
+  // 'toString()' override
+  static v8::Handle<v8::Value> ToString(const v8::Arguments&);
+
 protected:
   pthread_mutex_t mutex;
 

@@ -84,6 +84,8 @@ void Application::Init(v8::Handle<Object> target) {
 
   NODE_SET_METHOD(target, "createConnection", CreateConnection);
 
+  NODE_SET_PROTOTYPE_METHOD(t, "toString", ToString);
+
   target->Set(APPLICATION_CLASS_SYMBOL, application_constructor_template->GetFunction());
 }
 
@@ -115,6 +117,14 @@ v8::Handle<Value> Application::New(const Arguments& args) {
   Application* hw = new Application();
   hw->Wrap(args.This());
   return args.This();
+}
+
+// ToString //////////////////////////////////////////////////////////////////
+v8::Handle<Value> Application::ToString(const Arguments& args) {
+  HandleScope scope;
+  Application *app = ObjectWrap::Unwrap<Application>(args.This());
+  Local<String> str = String::New([[app->iTunesRef description] UTF8String]);
+  return scope.Close(str);
 }
 
 v8::Handle<Value> Application::Running(const Arguments& args) {
