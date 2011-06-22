@@ -90,6 +90,7 @@ void Application::Init(v8::Handle<Object> target) {
 }
 
 
+// C++ Constructor/Destructor ////////////////////////////////////////////////
 Application::Application() {
   int err = pthread_mutex_init(&mutex, NULL);
   if (err) {
@@ -108,6 +109,7 @@ Application::~Application() {
   }
 }
 
+// JavaScript Constructor/////////////////////////////////////////////////////
 v8::Handle<Value> Application::New(const Arguments& args) {
   HandleScope scope;
    if (args.Length() != 1 || !NEW_CHECKER->StrictEquals(args[0]->ToObject())) {
