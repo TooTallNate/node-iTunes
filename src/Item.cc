@@ -12,6 +12,7 @@ struct async_request {
   Persistent<Function> callback;
   Persistent<Object> thisRef;
   iTunesItem *itemRef;
+  void *input;
   void *result;
   pthread_mutex_t *mutex;
 };
@@ -28,7 +29,7 @@ void Item::Init(v8::Handle<Object> target) {
   item_constructor_template->SetClassName(ITEM_CLASS_SYMBOL);
   t->InstanceTemplate()->SetInternalFieldCount(1);
 
-  NODE_SET_PROTOTYPE_METHOD(t, "Name", Name);
+  NODE_SET_PROTOTYPE_METHOD(t, "name", Name);
 
   // The 'toString()' function uses sync I/O to get iTunes' stringified
   // version. The thought is that it's helpful for debugging/REPL, and probably
@@ -68,6 +69,7 @@ v8::Handle<Value> Item::ToString(const Arguments& args) {
 }
 
 // Name //////////////////////////////////////////////////////////////////////
+// Getter and Setter
 v8::Handle<Value> Item::Name(const Arguments& args) {
   HandleScope scope;
 
