@@ -14,7 +14,7 @@ namespace node_iTunes {
 
 class Application : public node::ObjectWrap {
 public:
-  iTunesApplication* iTunesRef;
+  iTunesApplication* itemRef;
 
   Application();
   ~Application();

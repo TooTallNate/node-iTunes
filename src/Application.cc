@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "async_macros.h"
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,13 +25,14 @@ struct create_connection_request {
   char* username;
   char* password;
   v8::Persistent<v8::Function> cb;
-  iTunesApplication* iTunesRef;
+  iTunesApplication* itemRef;
 };
 
 struct async_request {
   Persistent<Function> callback;
   Persistent<Object> thisRef;
-  iTunesApplication *iTunesRef;
+  iTunesApplication *itemRef;
+  void *input;
   void *result;
   char *id;
   pthread_mutex_t *mutex;
@@ -92,21 +94,15 @@ void Application::Init(v8::Handle<Object> target) {
 
 // C++ Constructor/Destructor ////////////////////////////////////////////////
 Application::Application() {
-  int err = pthread_mutex_init(&mutex, NULL);
-  if (err) {
-    printf("Got Error! %d", err);
-  }
+  pthread_mutex_init(&mutex, NULL);
 }
 
 Application::~Application() {
-  if (iTunesRef) {
-    [iTunesRef release];
+  if (itemRef) {
+    [itemRef release];
   }
-  iTunesRef = nil;
-  int err = pthread_mutex_destroy(&mutex);
-  if (err) {
-    printf("Got Error! %d", err);
-  }
+  itemRef = nil;
+  pthread_mutex_destroy(&mutex);
 }
 
 // JavaScript Constructor/////////////////////////////////////////////////////
@@ -125,91 +121,62 @@ v8::Handle<Value> Application::New(const Arguments& args) {
 v8::Handle<Value> Application::ToString(const Arguments& args) {
   HandleScope scope;
   Application *app = ObjectWrap::Unwrap<Application>(args.This());
-  Local<String> str = String::New([[app->iTunesRef description] UTF8String]);
+  Local<String> str = String::New([[app->itemRef description] UTF8String]);
   return scope.Close(str);
 }
 
+// Running ////////////////////////////////////////////////////////////////////
 v8::Handle<Value> Application::Running(const Arguments& args) {
   HandleScope scope;
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
-  iTunesApplication* iTunes = it->iTunesRef;
+  iTunesApplication* iTunes = it->itemRef;
   v8::Handle<v8::Boolean> result = v8::Boolean::New([iTunes isRunning]);
   return scope.Close(result);
 }
 
+// Quit ///////////////////////////////////////////////////////////////////////
 v8::Handle<Value> Application::Quit(const Arguments& args) {
   HandleScope scope;
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
-  iTunesApplication* iTunes = it->iTunesRef;
+  iTunesApplication* iTunes = it->itemRef;
   [iTunes quit];
   return Undefined();
 }
 
 // CurrentTrack ///////////////////////////////////////////////////////////////
+// Readonly
 v8::Handle<Value> Application::CurrentTrack(const Arguments& args) {
   HandleScope scope;
-
-  if (args.Length() < 1) {
-    return ThrowException(Exception::TypeError(String::New("A callback function is required")));
-  }
-
-  Application* it = ObjectWrap::Unwrap<Application>(args.This());
-
-  async_request *ar = (async_request *)malloc(sizeof(struct async_request));
-  ar->iTunesRef = it->iTunesRef;
-  Local<Function> cb = Local<Function>::Cast(args[0]);
-  ar->callback = Persistent<Function>::New(cb);
-  ar->thisRef = Persistent<Object>::New(args.This());
-  ar->mutex = &it->mutex;
-
-  eio_custom(EIO_CurrentTrack, EIO_PRI_DEFAULT, EIO_AfterCurrentTrack, ar);
-  ev_ref(EV_DEFAULT_UC);
-
-  return scope.Close(Undefined());
+  REQUIRE_CALLBACK_ARG;
+  INIT(Application);
+  GET_CALLBACK;
+  BEGIN_ASYNC(EIO_CurrentTrack, EIO_AfterCurrentTrack);
 }
 
 int Application::EIO_CurrentTrack(eio_req *req) {
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  async_request *ar = (async_request *)req->data;
-  pthread_mutex_lock( ar->mutex );
-  usleep(10 * 1000);
-  iTunesTrack *track = [[ar->iTunesRef currentTrack] get];
+  INIT_EIO_FUNC;
+  iTunesTrack *track = [[ar->itemRef currentTrack] get];
   [track retain];
   ar->result = (void *)track;
   ar->id = (char *)[[track persistentID] UTF8String];
-  pthread_mutex_unlock( ar->mutex );
-  [pool drain];
-  return 0;
+  FINISH_EIO_FUNC;
 }
 
 int Application::EIO_AfterCurrentTrack(eio_req *req) {
-  HandleScope scope;
-  ev_unref(EV_DEFAULT_UC);
-  async_request *ar = (async_request *)req->data;
-
-  TryCatch try_catch;
-  v8::Handle<Value> argv[2];
+  INIT_AFTER_FUNC;
   // TODO: Error Handling
   argv[0] = Null();
   argv[1] = Item::WrapInstance((iTunesItem *)ar->result, ar->id);
-  ar->callback->Call(ar->thisRef, 2, argv);
-
-  if (try_catch.HasCaught()) {
-    FatalException(try_catch);
-  }
-
-  ar->callback.Dispose();
-  ar->thisRef.Dispose();
-  free(ar);
-  return 0;
+  FINISH_AFTER_FUNC;
 }
 
 
 // Selection //////////////////////////////////////////////////////////////////
+// Readonly
 v8::Handle<Value> Application::Selection(const Arguments& args) {
   HandleScope scope;
   //Application* it = ObjectWrap::Unwrap<Application>(args.This());
-  //iTunesApplication* iTunes = it->iTunesRef;
+  //iTunesApplication* iTunes = it->itemRef;
   //SBElementArray* selection = [iTunes selection];
   //NSArray* selection = [[iTunes selection] get];
   //Local<Object> Track::WrapInstance
@@ -219,49 +186,26 @@ v8::Handle<Value> Application::Selection(const Arguments& args) {
 // Volume /////////////////////////////////////////////////////////////////////
 v8::Handle<Value> Application::Volume(const Arguments& args) {
   HandleScope scope;
-
-  Application* it = ObjectWrap::Unwrap<Application>(args.This());
-
-  async_request *ar = (async_request *)malloc(sizeof(struct async_request));
-  ar->iTunesRef = it->iTunesRef;
-  Local<Function> cb = Local<Function>::Cast(args[0]);
-  ar->callback = Persistent<Function>::New(cb);
-  ar->thisRef = Persistent<Object>::New(args.This());
-
-  eio_custom(EIO_Volume, EIO_PRI_DEFAULT, EIO_AfterVolume, ar);
-  ev_ref(EV_DEFAULT_UC);
-  return scope.Close(Undefined());
+  INIT(Application);
+  if (HAS_CALLBACK_ARG) {
+    GET_CALLBACK;
+  }
+  BEGIN_ASYNC(EIO_Volume, EIO_AfterVolume);
 }
 
 int Application::EIO_Volume(eio_req *req) {
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  async_request *ar = (async_request *)req->data;
-  NSInteger vol = [ar->iTunesRef soundVolume];
+  INIT_EIO_FUNC;
+  NSInteger vol = [ar->itemRef soundVolume];
   req->result = vol;
-  [pool drain];
-  return 0;
+  FINISH_EIO_FUNC;
 }
 
 int Application::EIO_AfterVolume(eio_req *req) {
-  HandleScope scope;
-  ev_unref(EV_DEFAULT_UC);
-  async_request *ar = (async_request *)req->data;
-
-  TryCatch try_catch;
-  v8::Handle<Value> argv[2];
+  INIT_AFTER_FUNC;
   // TODO: Error Handling
   argv[0] = Null();
   argv[1] = Integer::New(req->result);
-  ar->callback->Call(ar->thisRef, 2, argv);
-
-  if (try_catch.HasCaught()) {
-    FatalException(try_catch);
-  }
-
-  ar->callback.Dispose();
-  ar->thisRef.Dispose();
-  free(ar);
-  return 0;
+  FINISH_AFTER_FUNC;
 }
 
 // Begins asynchronously creating a new Application instance. This should be
@@ -333,12 +277,12 @@ int Application::EIO_CreateConnection (eio_req *req) {
     urlStr = [urlStr stringByAppendingString: @"/iTunes" ];
     //NSLog(@"%@", urlStr);
     NSURL* url = [NSURL URLWithString: urlStr];
-    ccr->iTunesRef = [SBApplication applicationWithURL: url];
+    ccr->itemRef = [SBApplication applicationWithURL: url];
     free(ccr->host);
   } else {
     // If no 'options' object was provided, then simply connect to the local
     // iTunes installation. No credentials are required for this mode.
-    ccr->iTunesRef = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
+    ccr->itemRef = [SBApplication applicationWithBundleIdentifier:@"com.apple.iTunes"];
   }
   [pool drain];
   return 0;
@@ -356,7 +300,7 @@ int Application::EIO_AfterCreateConnection (eio_req *req) {
   constructor_args[0] = NEW_CHECKER;
   Local<Object> app = application_constructor_template->GetFunction()->NewInstance(1, constructor_args);
   Application* it = ObjectWrap::Unwrap<Application>(app);
-  it->iTunesRef = ccr->iTunesRef;
+  it->itemRef = ccr->itemRef;
   argv[1] = app;
 
   TryCatch try_catch;
