@@ -14,6 +14,9 @@ static Persistent<String> HOST_SYMBOL;
 static Persistent<String> USERNAME_SYMBOL;
 static Persistent<String> PASSWORD_SYMBOL;
 
+// Stupid little object used to ensure that users aren't calling 'new
+// Application' but rather 'iTunes.createConnection()'. There's probably
+// a better way to do this...
 static Persistent<Object> NEW_CHECKER;
 
 struct create_connection_request {
@@ -55,7 +58,7 @@ void Application::Init(v8::Handle<Object> target) {
   t->InstanceTemplate()->SetInternalFieldCount(1);
 
   //NODE_SET_PROTOTYPE_METHOD(t, "run", GetVolume);
-  NODE_SET_PROTOTYPE_METHOD(t, "isRunning", IsRunning);
+  NODE_SET_PROTOTYPE_METHOD(t, "running", Running);
   NODE_SET_PROTOTYPE_METHOD(t, "quit", Quit);
   //NODE_SET_PROTOTYPE_METHOD(t, "add", GetVolume);
   //NODE_SET_PROTOTYPE_METHOD(t, "backTrack", GetVolume);
@@ -75,10 +78,9 @@ void Application::Init(v8::Handle<Object> target) {
   //NODE_SET_PROTOTYPE_METHOD(t, "updateAllPodcasts", GetVolume);
   //NODE_SET_PROTOTYPE_METHOD(t, "updatePodcast", GetVolume);
   //NODE_SET_PROTOTYPE_METHOD(t, "openLocation", GetVolume);
-  NODE_SET_PROTOTYPE_METHOD(t, "getCurrentTrack", GetCurrentTrack);
-  NODE_SET_PROTOTYPE_METHOD(t, "getSelection", GetSelection);
-  NODE_SET_PROTOTYPE_METHOD(t, "getVolume", GetVolume);
-  NODE_SET_PROTOTYPE_METHOD(t, "setVolume", SetVolume);
+  NODE_SET_PROTOTYPE_METHOD(t, "currentTrack", CurrentTrack);
+  NODE_SET_PROTOTYPE_METHOD(t, "selection", Selection);
+  NODE_SET_PROTOTYPE_METHOD(t, "volume", Volume);
 
   NODE_SET_METHOD(target, "createConnection", CreateConnection);
 
@@ -115,7 +117,7 @@ v8::Handle<Value> Application::New(const Arguments& args) {
   return args.This();
 }
 
-v8::Handle<Value> Application::IsRunning(const Arguments& args) {
+v8::Handle<Value> Application::Running(const Arguments& args) {
   HandleScope scope;
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
   iTunesApplication* iTunes = it->iTunesRef;
@@ -131,8 +133,8 @@ v8::Handle<Value> Application::Quit(const Arguments& args) {
   return Undefined();
 }
 
-// GetCurrentTrack ////////////////////////////////////////////////////////////
-v8::Handle<Value> Application::GetCurrentTrack(const Arguments& args) {
+// CurrentTrack ///////////////////////////////////////////////////////////////
+v8::Handle<Value> Application::CurrentTrack(const Arguments& args) {
   HandleScope scope;
 
   if (args.Length() < 1) {
@@ -148,13 +150,13 @@ v8::Handle<Value> Application::GetCurrentTrack(const Arguments& args) {
   ar->thisRef = Persistent<Object>::New(args.This());
   ar->mutex = &it->mutex;
 
-  eio_custom(EIO_GetCurrentTrack, EIO_PRI_DEFAULT, EIO_AfterGetCurrentTrack, ar);
+  eio_custom(EIO_CurrentTrack, EIO_PRI_DEFAULT, EIO_AfterCurrentTrack, ar);
   ev_ref(EV_DEFAULT_UC);
 
   return scope.Close(Undefined());
 }
 
-int Application::EIO_GetCurrentTrack(eio_req *req) {
+int Application::EIO_CurrentTrack(eio_req *req) {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   async_request *ar = (async_request *)req->data;
   pthread_mutex_lock( ar->mutex );
@@ -168,7 +170,7 @@ int Application::EIO_GetCurrentTrack(eio_req *req) {
   return 0;
 }
 
-int Application::EIO_AfterGetCurrentTrack(eio_req *req) {
+int Application::EIO_AfterCurrentTrack(eio_req *req) {
   HandleScope scope;
   ev_unref(EV_DEFAULT_UC);
   async_request *ar = (async_request *)req->data;
@@ -191,8 +193,8 @@ int Application::EIO_AfterGetCurrentTrack(eio_req *req) {
 }
 
 
-// GetSelection ///////////////////////////////////////////////////////////////
-v8::Handle<Value> Application::GetSelection(const Arguments& args) {
+// Selection //////////////////////////////////////////////////////////////////
+v8::Handle<Value> Application::Selection(const Arguments& args) {
   HandleScope scope;
   //Application* it = ObjectWrap::Unwrap<Application>(args.This());
   //iTunesApplication* iTunes = it->iTunesRef;
@@ -202,13 +204,9 @@ v8::Handle<Value> Application::GetSelection(const Arguments& args) {
   return Undefined();
 }
 
-// GetVolume //////////////////////////////////////////////////////////////////
-v8::Handle<Value> Application::GetVolume(const Arguments& args) {
+// Volume /////////////////////////////////////////////////////////////////////
+v8::Handle<Value> Application::Volume(const Arguments& args) {
   HandleScope scope;
-
-  if (args.Length() < 1) {
-    return ThrowException(Exception::TypeError(String::New("A callback function is required")));
-  }
 
   Application* it = ObjectWrap::Unwrap<Application>(args.This());
 
@@ -218,12 +216,12 @@ v8::Handle<Value> Application::GetVolume(const Arguments& args) {
   ar->callback = Persistent<Function>::New(cb);
   ar->thisRef = Persistent<Object>::New(args.This());
 
-  eio_custom(EIO_GetVolume, EIO_PRI_DEFAULT, EIO_AfterGetVolume, ar);
+  eio_custom(EIO_Volume, EIO_PRI_DEFAULT, EIO_AfterVolume, ar);
   ev_ref(EV_DEFAULT_UC);
   return scope.Close(Undefined());
 }
 
-int Application::EIO_GetVolume(eio_req *req) {
+int Application::EIO_Volume(eio_req *req) {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   async_request *ar = (async_request *)req->data;
   NSInteger vol = [ar->iTunesRef soundVolume];
@@ -232,7 +230,7 @@ int Application::EIO_GetVolume(eio_req *req) {
   return 0;
 }
 
-int Application::EIO_AfterGetVolume(eio_req *req) {
+int Application::EIO_AfterVolume(eio_req *req) {
   HandleScope scope;
   ev_unref(EV_DEFAULT_UC);
   async_request *ar = (async_request *)req->data;
@@ -254,27 +252,12 @@ int Application::EIO_AfterGetVolume(eio_req *req) {
   return 0;
 }
 
-// SetVolume //////////////////////////////////////////////////////////////////
-v8::Handle<Value> Application::SetVolume(const Arguments& args) {
-  HandleScope scope;
-  Application* it = ObjectWrap::Unwrap<Application>(args.This());
-  iTunesApplication* iTunes = it->iTunesRef;
-  int val = args[0]->ToInteger()->Int32Value();
-  [iTunes setSoundVolume:val];
-  Local<Integer> result = Integer::New([iTunes soundVolume]);
-  return scope.Close(result);
-}
-
 // Begins asynchronously creating a new Application instance. This should be
 // done on the thread pool, since the SBApplication constructor methods can
 // potentially block for a very long time (especially if a modal dialog is
-// raised for user credentials).
+// presented for user credentials).
 v8::Handle<Value> Application::CreateConnection(const Arguments& args) {
   HandleScope scope;
-
-  if (args.Length() < 1) {
-    return ThrowException(Exception::TypeError(String::New("A callback function is required")));
-  }
 
   create_connection_request* ccr = (create_connection_request *) malloc(sizeof(struct create_connection_request));
   ccr->host = NULL;
@@ -364,7 +347,6 @@ int Application::EIO_AfterCreateConnection (eio_req *req) {
   it->iTunesRef = ccr->iTunesRef;
   argv[1] = app;
 
-  //argv[2] = String::New(sr->name);
   TryCatch try_catch;
   ccr->cb->Call(Context::GetCurrent()->Global(), 2, argv);
   if (try_catch.HasCaught()) {

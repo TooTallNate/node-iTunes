@@ -29,9 +29,9 @@ public:
 
   // iTunes Functions -> JS Functions
   static v8::Handle<v8::Value> Quit(const v8::Arguments&);
-  //static v8::Handle<v8::Value> Run(const v8::Arguments&);
-  static v8::Handle<v8::Value> IsRunning(const v8::Arguments&);
-  /*static v8::Handle<v8::Value> Add(const v8::Arguments&);
+  static v8::Handle<v8::Value> Run(const v8::Arguments&);
+  static v8::Handle<v8::Value> Running(const v8::Arguments&);
+  static v8::Handle<v8::Value> Add(const v8::Arguments&);
   static v8::Handle<v8::Value> BackTrack(const v8::Arguments&);
   static v8::Handle<v8::Value> Convert(const v8::Arguments&);
   static v8::Handle<v8::Value> FastForward(const v8::Arguments&);
@@ -48,15 +48,12 @@ public:
   static v8::Handle<v8::Value> Subscribe(const v8::Arguments&);
   static v8::Handle<v8::Value> UpdateAllPodcasts(const v8::Arguments&);
   static v8::Handle<v8::Value> UpdatePodcast(const v8::Arguments&);
-  static v8::Handle<v8::Value> OpenLocation(const v8::Arguments&);*/
+  static v8::Handle<v8::Value> OpenLocation(const v8::Arguments&);
 
-  // iTunes Property Getters -> JS Functions
-  static v8::Handle<v8::Value> GetCurrentTrack(const v8::Arguments&);
-  static v8::Handle<v8::Value> GetSelection(const v8::Arguments&);
-  static v8::Handle<v8::Value> GetVolume(const v8::Arguments&);
-
-  // iTunes Property Setters -> JS Functions
-  static v8::Handle<v8::Value> SetVolume(const v8::Arguments&);
+  // iTunes Property -> JS Functions
+  static v8::Handle<v8::Value> CurrentTrack(const v8::Arguments&);
+  static v8::Handle<v8::Value> Selection(const v8::Arguments&);
+  static v8::Handle<v8::Value> Volume(const v8::Arguments&);
 
 protected:
   pthread_mutex_t mutex;
@@ -65,14 +62,11 @@ private:
   static int EIO_CreateConnection (eio_req *);
   static int EIO_AfterCreateConnection (eio_req *);
 
-  static int EIO_GetCurrentTrack (eio_req *);
-  static int EIO_AfterGetCurrentTrack (eio_req *);
+  static int EIO_CurrentTrack (eio_req *);
+  static int EIO_AfterCurrentTrack (eio_req *);
 
-  static int EIO_GetVolume (eio_req *);
-  static int EIO_AfterGetVolume (eio_req *);
-
-  static int EIO_SetVolume (eio_req *);
-  static int EIO_AfterSetVolume (eio_req *);
+  static int EIO_Volume (eio_req *);
+  static int EIO_AfterVolume (eio_req *);
 
 }; // class iTunesApplication
 
