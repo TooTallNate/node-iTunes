@@ -1,3 +1,5 @@
+#define INVALID_VOLUME 1069
+
 #define HAS_CALLBACK_ARG args[args.Length()-1]->IsFunction()
 
 #define HAS_INPUT_ARG (!args[0]->IsFunction() && !args[0]->IsUndefined())

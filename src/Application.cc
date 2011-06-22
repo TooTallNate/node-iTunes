@@ -32,6 +32,7 @@ struct async_request {
   Persistent<Function> callback;
   Persistent<Object> thisRef;
   iTunesApplication *itemRef;
+  int32_t  intInput;
   void *input;
   void *result;
   char *id;
@@ -187,6 +188,7 @@ v8::Handle<Value> Application::Selection(const Arguments& args) {
 v8::Handle<Value> Application::Volume(const Arguments& args) {
   HandleScope scope;
   INIT(Application);
+  ar->intInput = HAS_INPUT_ARG ? args[0]->Int32Value() : INVALID_VOLUME;
   if (HAS_CALLBACK_ARG) {
     GET_CALLBACK;
   }
@@ -195,6 +197,11 @@ v8::Handle<Value> Application::Volume(const Arguments& args) {
 
 int Application::EIO_Volume(eio_req *req) {
   INIT_EIO_FUNC;
+  int32_t input = ar->intInput;
+  if (input != INVALID_VOLUME) {
+    // A value was passed to set the volume to
+    [ar->itemRef setSoundVolume: input];
+  }
   NSInteger vol = [ar->itemRef soundVolume];
   req->result = vol;
   FINISH_EIO_FUNC;
