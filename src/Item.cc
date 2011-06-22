@@ -28,8 +28,7 @@ void Item::Init(v8::Handle<Object> target) {
   item_constructor_template->SetClassName(ITEM_CLASS_SYMBOL);
   t->InstanceTemplate()->SetInternalFieldCount(1);
 
-  NODE_SET_PROTOTYPE_METHOD(t, "getName", GetName);
-  //NODE_SET_PROTOTYPE_METHOD(t, "setName", GetName);
+  NODE_SET_PROTOTYPE_METHOD(t, "Name", Name);
 
   // The 'toString()' function uses sync I/O to get iTunes' stringified
   // version. The thought is that it's helpful for debugging/REPL, and probably
@@ -55,9 +54,6 @@ Item::~Item() {
 // JavaScript Constructor/////////////////////////////////////////////////////
 v8::Handle<Value> Item::New(const Arguments& args) {
   HandleScope scope;
-  //if (args.Length() != 1 || !NEW_CHECKER->StrictEquals(args[0]->ToObject())) {
-  //  return ThrowException(Exception::TypeError(String::New("Use '.createConnection()' to get an Application instance")));
-  //}
   Item* item = new Item();
   item->Wrap(args.This());
   return args.This();
@@ -71,13 +67,9 @@ v8::Handle<Value> Item::ToString(const Arguments& args) {
   return scope.Close(str);
 }
 
-// GetName ///////////////////////////////////////////////////////////////////
-v8::Handle<Value> Item::GetName(const Arguments& args) {
+// Name //////////////////////////////////////////////////////////////////////
+v8::Handle<Value> Item::Name(const Arguments& args) {
   HandleScope scope;
-
-  if (args.Length() < 1) {
-    return ThrowException(Exception::TypeError(String::New("A callback function is required")));
-  }
 
   Item *item = ObjectWrap::Unwrap<Item>(args.This());
 
@@ -88,13 +80,13 @@ v8::Handle<Value> Item::GetName(const Arguments& args) {
   ar->thisRef = Persistent<Object>::New(args.This());
   ar->mutex = &item->mutex;
 
-  eio_custom(EIO_GetName, EIO_PRI_DEFAULT, EIO_AfterGetName, ar);
+  eio_custom(EIO_Name, EIO_PRI_DEFAULT, EIO_AfterName, ar);
   ev_ref(EV_DEFAULT_UC);
 
   return scope.Close(Undefined());
 }
 
-int Item::EIO_GetName (eio_req *req) {
+int Item::EIO_Name (eio_req *req) {
   async_request *ar = (async_request *)req->data;
   // TODO: Find a way around using an autorelease pool on the thread pool
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -113,7 +105,7 @@ int Item::EIO_GetName (eio_req *req) {
   return 0;
 }
 
-int Item::EIO_AfterGetName (eio_req *req) {
+int Item::EIO_AfterName (eio_req *req) {
   HandleScope scope;
   ev_unref(EV_DEFAULT_UC);
   async_request *ar = (async_request *)req->data;

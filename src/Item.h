@@ -27,14 +27,11 @@ public:
   static v8::Handle<v8::Value> WrapInstance(iTunesItem* track, char *id);
   static v8::Handle<v8::Value> New(const v8::Arguments&);
 
-  // iTunes Property Getters -> JS Functions
-  static v8::Handle<v8::Value> GetContainer(const v8::Arguments&);
-  static v8::Handle<v8::Value> GetId(const v8::Arguments&);
-  static v8::Handle<v8::Value> GetName(const v8::Arguments&);
-  static v8::Handle<v8::Value> GetPersistentId(const v8::Arguments&);
-
-  // iTunes Property Setters -> JS Functions
-  static v8::Handle<v8::Value> SetName(const v8::Arguments&);
+  // iTunes Property -> JS Functions
+  static v8::Handle<v8::Value> Container(const v8::Arguments&);
+  static v8::Handle<v8::Value> Id(const v8::Arguments&);
+  static v8::Handle<v8::Value> Name(const v8::Arguments&);
+  static v8::Handle<v8::Value> PersistentId(const v8::Arguments&);
 
   // 'toString()' override
   static v8::Handle<v8::Value> ToString(const v8::Arguments&);
@@ -43,20 +40,17 @@ protected:
   pthread_mutex_t mutex;
 
 private:
-  static int EIO_GetName (eio_req *);
-  static int EIO_AfterGetName (eio_req *);
+  static int EIO_Name (eio_req *);
+  static int EIO_AfterName (eio_req *);
 
-  static int EIO_GetId (eio_req *);
-  static int EIO_AfterGetId (eio_req *);
+  static int EIO_Id (eio_req *);
+  static int EIO_AfterId (eio_req *);
 
-  static int EIO_GetPersistentId (eio_req *);
-  static int EIO_AfterGetPersistentId (eio_req *);
+  static int EIO_PersistentId (eio_req *);
+  static int EIO_AfterPersistentId (eio_req *);
 
-  static int EIO_GetContainer (eio_req *);
-  static int EIO_AfterGetContainer (eio_req *);
-
-  static int EIO_SetName (eio_req *);
-  static int EIO_AfterSetName (eio_req *);
+  static int EIO_Container (eio_req *);
+  static int EIO_AfterContainer (eio_req *);
 
 }; // class Item
 
