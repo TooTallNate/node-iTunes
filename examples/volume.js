@@ -7,11 +7,14 @@ function onConnection (err, itunes) {
   console.timeEnd('createConnection');
   if (err) throw err;
 
-  var val = Number( process.argv[2] || Math.floor(Math.random() * 100) );
-  console.log('setting volume to: %d', val);
-
   console.time('volume');
-  itunes.volume(val, onVolume);
+  if (process.argv[2]) {
+    var val = Number( process.argv[2] );
+    console.log('setting volume to: %d', val);
+    itunes.volume(val, onVolume);
+  } else {
+    itunes.volume(onVolume);
+  }
 }
 
 function onVolume (err, v) {
