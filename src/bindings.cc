@@ -8,6 +8,7 @@
 #import "URLTrack.h"
 #import "Playlist.h"
 #import "Source.h"
+#import "UserPlaylist.h"
 #import "iTunes.h"
 
 using namespace node;
@@ -22,6 +23,7 @@ v8::Persistent<v8::FunctionTemplate> file_track_constructor_template;
 v8::Persistent<v8::FunctionTemplate> url_track_constructor_template;
 v8::Persistent<v8::FunctionTemplate> playlist_constructor_template;
 v8::Persistent<v8::FunctionTemplate> source_constructor_template;
+v8::Persistent<v8::FunctionTemplate> user_playlist_constructor_template;
 
 extern "C" void init(v8::Handle<Object> target) {
   HandleScope scope;
@@ -31,6 +33,7 @@ extern "C" void init(v8::Handle<Object> target) {
   FileTrack::Init(target);
   URLTrack::Init(target);
   Playlist::Init(target);
+  UserPlaylist::Init(target);
   Source::Init(target);
 }
 

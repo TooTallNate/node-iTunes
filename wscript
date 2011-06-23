@@ -13,4 +13,4 @@ def build(bld):
   obj.target = "bindings"
   obj.source = ["src/bindings.cc", "src/Application.cc", "src/FileTrack.cc",
       "src/Item.cc", "src/Item_WrapInstance.cc", "src/Track.cc", "src/URLTrack.cc",
-      "src/Playlist.cc", "src/Source.cc"]
+      "src/Playlist.cc", "src/UserPlaylist.cc", "src/Source.cc"]
