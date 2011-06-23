@@ -104,7 +104,14 @@ int Item::EIO_AfterContainer(eio_req *req) {
 v8::Handle<Value> Item::Name(const Arguments& args) {
   HandleScope scope;
   INIT(Item);
-  // TODO: Setter support
+  if (HAS_INPUT_ARG) {
+    String::Utf8Value name(args[0]);
+    char *input = (char *)malloc(strlen(*name) + 1);
+    strcpy(input, *name);
+    ar->input = input;
+  } else {
+    ar->input = NULL;
+  }
   if (HAS_CALLBACK_ARG) {
     GET_CALLBACK;
   }
@@ -113,6 +120,12 @@ v8::Handle<Value> Item::Name(const Arguments& args) {
 
 int Item::EIO_Name (eio_req *req) {
   INIT_EIO_FUNC;
+  if (ar->input != NULL) {
+    // set
+    NSString *name = [NSString stringWithCString: (const char *)ar->input encoding: NSUTF8StringEncoding];
+    [ar->itemRef setName: name];
+  }
+  // get
   NSString *str = [ar->itemRef name];
   if (str) {
     [str retain];
