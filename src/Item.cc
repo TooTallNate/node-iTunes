@@ -1,4 +1,5 @@
 #include "Item.h"
+#include "async_macros.h"
 #include <unistd.h>
 
 using namespace node;
@@ -72,28 +73,16 @@ v8::Handle<Value> Item::ToString(const Arguments& args) {
 // Getter and Setter
 v8::Handle<Value> Item::Name(const Arguments& args) {
   HandleScope scope;
-
-  Item *item = ObjectWrap::Unwrap<Item>(args.This());
-
-  async_request *ar = (async_request *)malloc(sizeof(struct async_request));
-  ar->itemRef = item->itemRef;
-  Local<Function> cb = Local<Function>::Cast(args[0]);
-  ar->callback = Persistent<Function>::New(cb);
-  ar->thisRef = Persistent<Object>::New(args.This());
-  ar->mutex = &item->mutex;
-
-  eio_custom(EIO_Name, EIO_PRI_DEFAULT, EIO_AfterName, ar);
-  ev_ref(EV_DEFAULT_UC);
-
-  return scope.Close(Undefined());
+  INIT(Item);
+  // TODO: Setter support
+  if (HAS_CALLBACK_ARG) {
+    GET_CALLBACK;
+  }
+  BEGIN_ASYNC(EIO_Name, EIO_AfterName);
 }
 
 int Item::EIO_Name (eio_req *req) {
-  async_request *ar = (async_request *)req->data;
-  // TODO: Find a way around using an autorelease pool on the thread pool
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  pthread_mutex_lock( ar->mutex );
-  usleep(10 * 1000);
+  INIT_EIO_FUNC;
   NSString *str = [ar->itemRef name];
   if (str) {
     [str retain];
@@ -102,30 +91,15 @@ int Item::EIO_Name (eio_req *req) {
     NSError *error = [ar->itemRef lastError];
     NSLog(@"Got Error: %@", error);
   }
-  pthread_mutex_unlock( ar->mutex );
-  [pool drain];
-  return 0;
+  FINISH_EIO_FUNC;
 }
 
 int Item::EIO_AfterName (eio_req *req) {
-  HandleScope scope;
-  ev_unref(EV_DEFAULT_UC);
-  async_request *ar = (async_request *)req->data;
-
-  TryCatch try_catch;
-  v8::Handle<Value> argv[2];
+  INIT_AFTER_FUNC;
   // TODO: Error Handling
   argv[0] = Null();
   argv[1] = String::New((const char *)ar->result);
-  ar->callback->Call(ar->thisRef, 2, argv);
-
-  if (try_catch.HasCaught()) {
-    FatalException(try_catch);
-  }
-  ar->callback.Dispose();
-  ar->thisRef.Dispose();
-  free(ar);
-  return 0;
+  FINISH_AFTER_FUNC;
 }
 
 
