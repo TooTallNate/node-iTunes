@@ -15,7 +15,7 @@ void UserPlaylist::Init(v8::Handle<Object> target) {
 
   Local<FunctionTemplate> t = FunctionTemplate::New(New);
   user_playlist_constructor_template = Persistent<FunctionTemplate>::New(t);
-  user_playlist_constructor_template->Inherit(item_constructor_template);
+  user_playlist_constructor_template->Inherit(playlist_constructor_template);
   user_playlist_constructor_template->SetClassName(USER_PLAYLIST_CLASS_SYMBOL);
   t->InstanceTemplate()->SetInternalFieldCount(1);
 
