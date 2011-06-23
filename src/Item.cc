@@ -15,6 +15,7 @@ struct async_request {
   iTunesItem *itemRef;
   void *input;
   void *result;
+  char *id;
   pthread_mutex_t *mutex;
 };
 
@@ -30,6 +31,7 @@ void Item::Init(v8::Handle<Object> target) {
   item_constructor_template->SetClassName(ITEM_CLASS_SYMBOL);
   t->InstanceTemplate()->SetInternalFieldCount(1);
 
+  NODE_SET_PROTOTYPE_METHOD(t, "container", Container);
   NODE_SET_PROTOTYPE_METHOD(t, "name", Name);
 
   // The 'toString()' function uses sync I/O to get iTunes' stringified
@@ -69,8 +71,36 @@ v8::Handle<Value> Item::ToString(const Arguments& args) {
   return scope.Close(str);
 }
 
+
+// Container //////////////////////////////////////////////////////////////////
+// Readonly
+v8::Handle<Value> Item::Container(const Arguments& args) {
+  HandleScope scope;
+  REQUIRE_CALLBACK_ARG;
+  INIT(Item);
+  GET_CALLBACK;
+  BEGIN_ASYNC(EIO_Container, EIO_AfterContainer);
+}
+
+int Item::EIO_Container(eio_req *req) {
+  INIT_EIO_FUNC;
+  iTunesItem *container = [[ar->itemRef container] get];
+  [container retain];
+  ar->result = (void *)container;
+  ar->id = (char *)[[container persistentID] UTF8String];
+  FINISH_EIO_FUNC;
+}
+
+int Item::EIO_AfterContainer(eio_req *req) {
+  INIT_AFTER_FUNC;
+  // TODO: Error Handling
+  argv[0] = Null();
+  argv[1] = Item::WrapInstance((iTunesItem *)ar->result, ar->id);
+  FINISH_AFTER_FUNC;
+}
+
+
 // Name //////////////////////////////////////////////////////////////////////
-// Getter and Setter
 v8::Handle<Value> Item::Name(const Arguments& args) {
   HandleScope scope;
   INIT(Item);
