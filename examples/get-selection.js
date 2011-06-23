@@ -12,6 +12,7 @@ function onConn (err, c) {
 function onSelection (err, selection) {
   if (err) throw err;
   if (selection.length > 0) {
+    console.log("%d Selected Tracks:", selection.length);
     selection.forEach(function (track, i) {
       console.log('Track %d:', i);
       console.log('  ', track);
