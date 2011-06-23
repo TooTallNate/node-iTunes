@@ -18,7 +18,13 @@ function onTrack (err, track) {
     return console.log('There is no track currently playing...');
 
   console.time('name');
-  track.name(onName);
+  var input = process.argv[2];
+  if (input) {
+    console.log('Setting name to: %s', input);
+    track.name(input, onName);
+  } else {
+    track.name(onName);
+  }
 }
 
 function onName (err, name) {
