@@ -23,14 +23,16 @@ iTunes.createConnection({
   username: 'uname',
   password: 'mysekretz',
   host: '192.168.0.14'
-}, function(err, itunes) {
+}, function (err, conn) {
   if (err) throw err;
 
-  // Set the volume of iTunes to 50%
-  itunes.setVolume(50);
+  // Set the volume of iTunes to 50%,
+  //   fire-and-forget style!
+  conn.volume(50);
 
-  // Go to the next track in the playlist
-  itunes.nextTrack();
+  conn.selection(function (err, selection) {
+    // Get an Array of `Track`s containing the current selection
+  });
 });
 ```
 
