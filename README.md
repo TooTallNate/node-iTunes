@@ -38,9 +38,16 @@ iTunes.createConnection({
 API
 ---
 
+Look at the [iTunes Header File][API] to see the [API][] that it exposes.
+`node-iTunes` aims to wrap as much of that functionality as is practical (there's
+a lot of it though!).
+
+If you come across a property or function that is missing from `node-iTunes`
+that you would like to use, then please open an Issue requesting it.
 
 
 
 [node]: http://nodejs.org
+[API]: https://github.com/TooTallNate/node-iTunes/blob/master/src/iTunes.h
 [iTunes]: http://www.apple.com/itunes
 [ScriptingBridge]: http://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ScriptingBridgeConcepts/Introduction/Introduction.html
