@@ -29,6 +29,7 @@ struct create_connection_request {
 };
 
 struct async_request {
+  BOOL hasCb;
   Persistent<Function> callback;
   Persistent<Object> thisRef;
   iTunesApplication *itemRef;

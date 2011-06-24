@@ -14,6 +14,7 @@
   CLASS *item = ObjectWrap::Unwrap<CLASS>(args.This());                        \
   async_request *ar = (async_request *)malloc(sizeof(struct async_request));   \
   ar->input = NULL;                                                            \
+  ar->hasCb = NO;                                                              \
   ar->itemRef = item->itemRef;                                                 \
   ar->mutex = &item->mutex;
 
@@ -21,7 +22,8 @@
 #define GET_CALLBACK     \
   Local<Function> cb = Local<Function>::Cast(args[args.Length() - 1]);            \
   ar->callback = Persistent<Function>::New(cb);                    \
-  ar->thisRef = Persistent<Object>::New(args.This());
+  ar->thisRef = Persistent<Object>::New(args.This());               \
+  ar->hasCb = YES;
 
 
 #define BEGIN_ASYNC(DO_FUNC, AFTER_FUNC)    \
@@ -51,15 +53,17 @@
 
 
 #define FINISH_AFTER_FUNC                  \
-  TryCatch tryCatch;                            \
-  ar->callback->Call(ar->thisRef, 2, argv);                 \
-  if (tryCatch.HasCaught()) {                        \
-    FatalException(tryCatch);                      \
-  }      \
-  ar->callback.Dispose();    \
-  ar->callback.Clear();    \
-  ar->thisRef.Dispose();     \
-  ar->thisRef.Clear();     \
-  free(ar);          \
+  if (ar->hasCb == YES) {        \
+    TryCatch tryCatch;                            \
+    ar->callback->Call(ar->thisRef, 2, argv);                 \
+    if (tryCatch.HasCaught()) {                        \
+      FatalException(tryCatch);                      \
+    }                                       \
+    ar->callback.Dispose();              \
+    ar->callback.Clear();          \
+    ar->thisRef.Dispose();           \
+    ar->thisRef.Clear();             \
+  }                             \
+  free(ar);                   \
   return 0;
 
