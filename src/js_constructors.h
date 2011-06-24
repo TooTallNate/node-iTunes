@@ -7,6 +7,7 @@ namespace node_iTunes {
   // the "Item::WrapInstance" function, which intelligently uses the proper JS
   // constuctor based on the given iTunesItem instance.
   extern v8::Persistent<v8::FunctionTemplate> application_constructor_template;
+  extern v8::Persistent<v8::FunctionTemplate> artwork_constructor_template;
   extern v8::Persistent<v8::FunctionTemplate> item_constructor_template;
   extern v8::Persistent<v8::FunctionTemplate> track_constructor_template;
   extern v8::Persistent<v8::FunctionTemplate> file_track_constructor_template;
