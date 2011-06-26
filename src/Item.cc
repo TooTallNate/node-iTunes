@@ -74,7 +74,8 @@ v8::Handle<Value> Item::Container(const Arguments& args) {
 
 int Item::EIO_Container(eio_req *req) {
   INIT_EIO_FUNC;
-  iTunesItem *container = [[ar->itemRef container] get];
+  iTunesItem *item = (iTunesItem *)ar->itemRef;
+  iTunesItem *container = [[item container] get];
   [container retain];
   ar->result = (void *)container;
   ar->id = (char *)[[container persistentID] UTF8String];
@@ -110,13 +111,14 @@ v8::Handle<Value> Item::Name(const Arguments& args) {
 
 int Item::EIO_Name (eio_req *req) {
   INIT_EIO_FUNC;
+  iTunesItem *item = (iTunesItem *)ar->itemRef;
   if (ar->input != NULL) {
     // set
     NSString *name = [NSString stringWithCString: (const char *)ar->input encoding: NSUTF8StringEncoding];
-    [ar->itemRef setName: name];
+    [item setName: name];
   }
   // get
-  NSString *str = [ar->itemRef name];
+  NSString *str = [item name];
   if (str) {
     [str retain];
     ar->result = (void *)[str UTF8String];
