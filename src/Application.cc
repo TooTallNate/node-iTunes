@@ -28,20 +28,6 @@ struct create_connection_request {
   iTunesApplication* itemRef;
 };
 
-struct async_request {
-  BOOL hasCb;
-  Persistent<Function> callback;
-  Persistent<Object> thisRef;
-  iTunesApplication *itemRef;
-  int32_t  intInput;
-  void *input;
-  void *result;
-  char *id;
-  pthread_mutex_t *mutex;
-};
-
-//Persistent<FunctionTemplate> Application::constructor_template;
-
 void Application::Init(v8::Handle<Object> target) {
   HandleScope scope;
 
@@ -157,7 +143,8 @@ v8::Handle<Value> Application::CurrentTrack(const Arguments& args) {
 
 int Application::EIO_CurrentTrack(eio_req *req) {
   INIT_EIO_FUNC;
-  iTunesTrack *track = [[ar->itemRef currentTrack] get];
+  iTunesApplication *app = (iTunesApplication *)ar->itemRef;
+  iTunesTrack *track = [[app currentTrack] get];
   [track retain];
   ar->result = (void *)track;
   ar->id = (char *)[[track persistentID] UTF8String];
@@ -185,7 +172,8 @@ v8::Handle<Value> Application::Selection(const Arguments& args) {
 
 int Application::EIO_Selection(eio_req *req) {
   INIT_EIO_FUNC;
-  NSArray *selectionGet = [[ar->itemRef selection] get];
+  iTunesApplication *app = (iTunesApplication *)ar->itemRef;
+  NSArray *selectionGet = [[app selection] get];
   [selectionGet retain];
   ar->result = selectionGet;
   FINISH_EIO_FUNC;
@@ -224,11 +212,12 @@ v8::Handle<Value> Application::Volume(const Arguments& args) {
 int Application::EIO_Volume(eio_req *req) {
   INIT_EIO_FUNC;
   int32_t input = ar->intInput;
+  iTunesApplication *app = (iTunesApplication *)ar->itemRef;
   if (input != INVALID_VOLUME) {
     // A value was passed to set the volume to
-    [ar->itemRef setSoundVolume: input];
+    [app setSoundVolume: input];
   }
-  NSInteger vol = [ar->itemRef soundVolume];
+  NSInteger vol = [app soundVolume];
   req->result = vol;
   FINISH_EIO_FUNC;
 }

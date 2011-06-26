@@ -1,6 +1,20 @@
+#import <Foundation/Foundation.h>
+#import <ScriptingBridge/ScriptingBridge.h>
 #import <v8.h>
 
 namespace node_iTunes {
+
+struct async_request {
+  BOOL hasCb;
+  v8::Persistent<v8::Function> callback;
+  v8::Persistent<v8::Object> thisRef;
+  SBObject *itemRef;
+  int32_t intInput;
+  void *input;
+  void *result;
+  char *id;
+  pthread_mutex_t *mutex;
+};
 
   // All the JavaScript Class constructor functions need to be defined here.
   // This is to avoid circular dependencies with header files and specifically

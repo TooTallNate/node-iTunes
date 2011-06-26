@@ -9,17 +9,6 @@ namespace node_iTunes {
 
 static Persistent<String> ITEM_CLASS_SYMBOL;
 
-struct async_request {
-  BOOL hasCb;
-  Persistent<Function> callback;
-  Persistent<Object> thisRef;
-  iTunesItem *itemRef;
-  void *input;
-  void *result;
-  char *id;
-  pthread_mutex_t *mutex;
-};
-
 void Item::Init(v8::Handle<Object> target) {
   HandleScope scope;
 
