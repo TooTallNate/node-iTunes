@@ -63,6 +63,7 @@ int Artwork::EIO_Data(eio_req *req) {
 
 int Artwork::EIO_AfterData(eio_req *req) {
   INIT_AFTER_FUNC;
+  // TODO: Error handling
   argv[0] = Null();
   // Create the buffer.
   // http://sambro.is-super-awesome.com/2011/03/03/creating-a-proper-buffer-in-a-node-c-addon
