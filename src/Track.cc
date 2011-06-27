@@ -79,14 +79,4 @@ int Track::EIO_AfterArtworks(eio_req *req) {
   FINISH_AFTER_FUNC;
 }
 
-
-
-/*v8::Handle<Value> Application::IsRunning(const Arguments& args) {
-  HandleScope scope;
-  Application* it = ObjectWrap::Unwrap<Application>(args.This());
-  iTunesApplication* iTunes = it->iTunesRef;
-  v8::Handle<v8::Boolean> result = v8::Boolean::New([iTunes isRunning]);
-  return scope.Close(result);
-}*/
-
 } // namespace node_iTunes
