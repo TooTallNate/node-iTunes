@@ -17,6 +17,10 @@ public:
   static v8::Handle<v8::Value> Format(const v8::Arguments&);
   static v8::Handle<v8::Value> Kind(const v8::Arguments&);
 
+private:
+  static int EIO_Data(eio_req *);
+  static int EIO_AfterData(eio_req *);
+
 }; // class Artwork
 
 } // namespace node_iTunes
