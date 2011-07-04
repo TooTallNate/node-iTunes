@@ -27,6 +27,17 @@ function onArtworks (err, artworks) {
       if (err) throw err;
       console.log(data.constructor.name);
       console.log(data.length);
+
+      // A test to make sure that gargabe collecting one of the Buffers doesn't
+      // cause a seg fault. Invoke node with '--expose_gc' to force garbage coll
+      data = null;
+      setTimeout(function() {
+        if (typeof gc != 'undefined') {
+          console.log('invoking gc()');
+          gc();
+        }
+      }, 1000);
+      setTimeout(function() { console.log("Done!"); }, 10000);
     });
   } else {
     console.log('The selected track does not have any album artwork...');
