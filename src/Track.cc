@@ -70,12 +70,14 @@ int Track::EIO_AfterArtworks(eio_req *req) {
   iTunesArtwork *a;
   for (NSUInteger i = 0; i < count; i++) {
     a = [res objectAtIndex: i];
+    [a retain];
     Local<Object> aWrap = artwork_constructor_template->GetFunction()->NewInstance();
     Artwork *aUnwrap = ObjectWrap::Unwrap<Artwork>(aWrap);
     aUnwrap->itemRef = a;
     result->Set(Integer::New(i), aWrap);
   }
   argv[1] = result;
+  [res release];
   FINISH_AFTER_FUNC;
 }
 
