@@ -45,7 +45,8 @@ Look at the [iTunes Header File][API] to see the [API][] that it exposes.
 a lot of it though!).
 
 If you come across a property or function that is missing from `node-iTunes`
-that you would like to use, then please open an Issue requesting it.
+that you would like to use, then please open an Issue requesting it and it will
+be a priority.
 
 
 
