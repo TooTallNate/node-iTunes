@@ -15,16 +15,23 @@ public:
   static v8::Handle<v8::Value> Update(const v8::Arguments&);
   static v8::Handle<v8::Value> Eject(const v8::Arguments&);
 
-  static v8::Handle<v8::Value> GetAudioCDPlaylists(const v8::Arguments&);
-  static v8::Handle<v8::Value> GetDevicePlaylists(const v8::Arguments&);
-  static v8::Handle<v8::Value> GetLibraryPlaylists(const v8::Arguments&);
-  static v8::Handle<v8::Value> GetPlaylists(const v8::Arguments&);
-  static v8::Handle<v8::Value> GetRadioTunerPlaylists(const v8::Arguments&);
-  static v8::Handle<v8::Value> GetUserPlaylists(const v8::Arguments&);
+  static v8::Handle<v8::Value> AudioCDPlaylists(const v8::Arguments&);
+  static v8::Handle<v8::Value> DevicePlaylists(const v8::Arguments&);
+  static v8::Handle<v8::Value> LibraryPlaylists(const v8::Arguments&);
+  static v8::Handle<v8::Value> Playlists(const v8::Arguments&);
+  static v8::Handle<v8::Value> RadioTunerPlaylists(const v8::Arguments&);
+  static v8::Handle<v8::Value> UserPlaylists(const v8::Arguments&);
 
-  static v8::Handle<v8::Value> GetCapacity(const v8::Arguments&);
-  static v8::Handle<v8::Value> GetFreeSpace(const v8::Arguments&);
-  static v8::Handle<v8::Value> GetKind(const v8::Arguments&);
+  static v8::Handle<v8::Value> Capacity(const v8::Arguments&);
+  static v8::Handle<v8::Value> FreeSpace(const v8::Arguments&);
+  static v8::Handle<v8::Value> Kind(const v8::Arguments&);
+
+private:
+  static int EIO_Playlists (eio_req *);
+  static int EIO_AfterPlaylists (eio_req *);
+
+  static int EIO_Kind (eio_req *);
+  static int EIO_AfterKind (eio_req *);
 
 }; // class Source
 

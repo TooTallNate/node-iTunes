@@ -1,4 +1,5 @@
 #include "Source.h"
+#import "async_macros.h"
 
 using namespace node;
 using namespace v8;
@@ -19,8 +20,7 @@ void Source::Init(v8::Handle<Object> target) {
   source_constructor_template->SetClassName(SOURCE_CLASS_SYMBOL);
   t->InstanceTemplate()->SetInternalFieldCount(1);
 
-  //NODE_SET_PROTOTYPE_METHOD(t, "run", GetVolume);
-  //NODE_SET_METHOD(target, "createConnection", CreateConnection);
+  NODE_SET_PROTOTYPE_METHOD(t, "kind", Kind);
 
   target->Set(SOURCE_CLASS_SYMBOL, source_constructor_template->GetFunction());
 }
@@ -32,6 +32,29 @@ void Source::Init(v8::Handle<Object> target) {
   Source* s = new Source();
   s->Wrap(args.This());
   return args.This();
+}
+
+// Kind ///////////////////////////////////////////////////////////////////////
+// Readonly
+v8::Handle<Value> Source::Kind(const Arguments& args) {
+  HandleScope scope;
+  REQUIRE_CALLBACK_ARG;
+  INIT(Source);
+  GET_CALLBACK;
+  BEGIN_ASYNC(EIO_Kind, EIO_AfterKind);
+}
+
+int Source::EIO_Kind(eio_req *req) {
+  INIT_EIO_FUNC;
+  iTunesSource *item = (iTunesSource *)ar->itemRef;
+  iTunesESrc kind =  [item kind];
+  NSLog(@"%d", kind);
+  req->result = kind;
+  FINISH_EIO_FUNC;
+}
+
+int Source::EIO_AfterKind(eio_req *req) {
+
 }
 
 } // namespace node_iTunes

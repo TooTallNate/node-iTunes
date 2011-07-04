@@ -12,4 +12,7 @@ function onConn (err, c) {
 function onSources (err, sources) {
   if (err) throw err;
   console.log(sources);
+  sources.forEach(function (source) {
+    source.kind(console.log);
+  });
 }
