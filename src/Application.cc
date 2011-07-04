@@ -72,6 +72,8 @@ void Application::Init(v8::Handle<Object> target) {
   NODE_SET_PROTOTYPE_METHOD(t, "selection", Selection);
   NODE_SET_PROTOTYPE_METHOD(t, "volume", Volume);
 
+  NODE_SET_PROTOTYPE_METHOD(t, "sources", Sources);
+
   NODE_SET_METHOD(target, "createConnection", CreateConnection);
 
   NODE_SET_PROTOTYPE_METHOD(t, "toString", ToString);
@@ -129,6 +131,51 @@ v8::Handle<Value> Application::Quit(const Arguments& args) {
   iTunesApplication* iTunes = it->itemRef;
   [iTunes quit];
   return Undefined();
+}
+
+// Sources ////////////////////////////////////////////////////////////////////
+// Readonly
+v8::Handle<Value> Application::Sources(const Arguments& args) {
+  HandleScope scope;
+  REQUIRE_CALLBACK_ARG;
+  INIT(Application);
+  GET_CALLBACK;
+  BEGIN_ASYNC(EIO_Sources, EIO_AfterSources);
+}
+
+int Application::EIO_Sources(eio_req *req) {
+  INIT_EIO_FUNC;
+  iTunesApplication *item = (iTunesApplication *)ar->itemRef;
+  SBElementArray *sources = [item sources];
+  NSUInteger count = [sources count];
+  NSMutableDictionary *sourcesDict = [NSMutableDictionary dictionaryWithCapacity: count];
+  iTunesSource *source;
+  for (NSUInteger i=0; i<count; i++) {
+    source = [sources objectAtIndex: i];
+    [sourcesDict setObject: source forKey: [source persistentID]];
+  }
+  [sourcesDict retain];
+  ar->result = sourcesDict;
+  FINISH_EIO_FUNC;
+}
+
+int Application::EIO_AfterSources(eio_req *req) {
+  INIT_AFTER_FUNC;
+  argv[0] = Null();
+  NSMutableDictionary *sourcesDict = (NSMutableDictionary *)ar->result;
+  NSArray *keys = [sourcesDict allKeys];
+  NSUInteger count = [keys count];
+  Local<Array> result = Array::New(count);
+  NSString *key;
+  for (NSUInteger i=0; i<count; i++) {
+    key = [keys objectAtIndex: i];
+    iTunesItem *item = (iTunesItem *)[sourcesDict objectForKey:key];
+    [item retain]; // Gets freed when the ObjectWrap is destroyed
+    result->Set(Integer::New(i), Item::WrapInstance(item, (char *)[key UTF8String]));
+  }
+  [sourcesDict release];
+  argv[1] = result;
+  FINISH_AFTER_FUNC;
 }
 
 // CurrentTrack ///////////////////////////////////////////////////////////////
@@ -297,7 +344,6 @@ int Application::EIO_CreateConnection (eio_req *req) {
     }
     urlStr = [urlStr stringByAppendingString: [NSString stringWithCString: ((const char*)ccr->host) encoding: NSUTF8StringEncoding ]];
     urlStr = [urlStr stringByAppendingString: @"/iTunes" ];
-    //NSLog(@"%@", urlStr);
     NSURL* url = [NSURL URLWithString: urlStr];
     ccr->itemRef = [SBApplication applicationWithURL: url];
     free(ccr->host);

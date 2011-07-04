@@ -50,6 +50,16 @@ public:
   static v8::Handle<v8::Value> UpdatePodcast(const v8::Arguments&);
   static v8::Handle<v8::Value> OpenLocation(const v8::Arguments&);
 
+  // Children ElementArrays
+  static v8::Handle<v8::Value> BrowserWindows(const v8::Arguments&);
+  static v8::Handle<v8::Value> Encoders(const v8::Arguments&);
+  static v8::Handle<v8::Value> EQPresets(const v8::Arguments&);
+  static v8::Handle<v8::Value> EQWindows(const v8::Arguments&);
+  static v8::Handle<v8::Value> PlaylistWindows(const v8::Arguments&);
+  static v8::Handle<v8::Value> Sources(const v8::Arguments&);
+  static v8::Handle<v8::Value> Visuals(const v8::Arguments&);
+  static v8::Handle<v8::Value> Windows(const v8::Arguments&);
+
   // iTunes Property -> JS Functions
   static v8::Handle<v8::Value> CurrentTrack(const v8::Arguments&);
   static v8::Handle<v8::Value> Selection(const v8::Arguments&);
@@ -64,6 +74,9 @@ protected:
 private:
   static int EIO_CreateConnection (eio_req *);
   static int EIO_AfterCreateConnection (eio_req *);
+
+  static int EIO_Sources (eio_req *);
+  static int EIO_AfterSources (eio_req *);
 
   static int EIO_CurrentTrack (eio_req *);
   static int EIO_AfterCurrentTrack (eio_req *);
