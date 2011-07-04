@@ -56,7 +56,7 @@ int Artwork::EIO_Data(eio_req *req) {
   NSImage *image = [item data];
   NSData *data = [image TIFFRepresentation];
   [data retain];
-  ar->result = (void *)[data bytes];
+  ar->result = data;
   req->result = [data length];
   FINISH_EIO_FUNC;
 }
@@ -67,7 +67,7 @@ int Artwork::EIO_AfterData(eio_req *req) {
   argv[0] = Null();
   // Create the buffer.
   // http://sambro.is-super-awesome.com/2011/03/03/creating-a-proper-buffer-in-a-node-c-addon
-  Buffer *slowBuffer = Buffer::New((char *)ar->result, req->result, free_artwork_data_callback, NULL);
+  Buffer *slowBuffer = Buffer::New((char *)[(NSData *)ar->result bytes], req->result, free_artwork_data_callback, ar->result);
   Local<Object> globalObj = Context::GetCurrent()->Global();
   Local<Function> bufferConstructor  = Local<Function>::Cast(globalObj->Get(String::New("Buffer")));
   v8::Handle<Value> constructorArgs[3] = { slowBuffer->handle_, Integer::New(req->result), Integer::New(0) };
@@ -77,7 +77,7 @@ int Artwork::EIO_AfterData(eio_req *req) {
 }
 
 void free_artwork_data_callback(char *data, void *hint) {
-  NSLog(@"free_artwork_data_callback called, probably leaking memory!!!");
+  [(NSData *)hint release];
 }
 
 
