@@ -12,7 +12,13 @@ public:
 
   static v8::Handle<v8::Value> New(const v8::Arguments&);
 
-  static v8::Handle<v8::Value> GetLocation(const v8::Arguments&);
+  static v8::Handle<v8::Value> Location(const v8::Arguments&);
+
+  static v8::Handle<v8::Value> Refresh(const v8::Arguments&);
+
+private:
+  static int EIO_Location (eio_req *req);
+  static int EIO_AfterLocation (eio_req *req);
 
 }; // class FileTrack
 
