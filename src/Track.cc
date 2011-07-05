@@ -25,6 +25,8 @@ void Track::Init(v8::Handle<Object> target) {
 
   NODE_SET_PROTOTYPE_METHOD(t, "artworks", Artworks);
 
+  NODE_SET_PROTOTYPE_METHOD(t, "artist", Artist);
+
   target->Set(TRACK_CLASS_SYMBOL, track_constructor_template->GetFunction());
 }
 
@@ -78,6 +80,44 @@ int Track::EIO_AfterArtworks(eio_req *req) {
   }
   argv[1] = result;
   [res release];
+  FINISH_AFTER_FUNC;
+}
+
+// Artist /////////////////////////////////////////////////////////////////////
+v8::Handle<Value> Track::Artist(const Arguments& args) {
+  HandleScope scope;
+  INIT(Track);
+  if (HAS_INPUT_ARG) {
+    String::Utf8Value val(args[0]);
+    char *input = (char *)malloc(strlen(*val) + 1);
+    strcpy(input, *val);
+    ar->input = input;
+  } else {
+    ar->input = NULL;
+  }
+  if (HAS_CALLBACK_ARG) {
+    GET_CALLBACK;
+  }
+  BEGIN_ASYNC(EIO_Artist, EIO_AfterArtist);
+}
+
+int Track::EIO_Artist (eio_req *req) {
+  INIT_EIO_FUNC;
+  iTunesTrack *item = (iTunesTrack *)ar->itemRef;
+  if (ar->input != NULL) {
+    NSString *val = [NSString stringWithCString: (const char *)ar->input encoding: NSUTF8StringEncoding];
+    [item setArtist: val];
+  }
+  NSString *str = [item artist];
+  [str retain];
+  ar->id = [str UTF8String];
+  FINISH_EIO_FUNC;
+}
+
+int Track::EIO_AfterArtist (eio_req *req) {
+  INIT_AFTER_FUNC;
+  argv[0] = Null();
+  argv[1] = String::New(ar->id);
   FINISH_AFTER_FUNC;
 }
 
