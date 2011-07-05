@@ -23,7 +23,7 @@ void weakItemCacheCallback(Persistent<Value> object, void *parameter) {
 
 // Convenience function that takes an iTunesItem instance (or any subclass)
 // and wraps it up into the proper JS class type, and returns it.
-v8::Handle<Value> Item::WrapInstance(iTunesItem* item, char *id) {
+v8::Handle<Value> Item::WrapInstance(iTunesItem* item, const char *id) {
   HandleScope scope;
 
   // If no item was given, then return 'null'

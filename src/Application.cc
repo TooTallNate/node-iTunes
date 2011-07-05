@@ -171,7 +171,7 @@ int Application::EIO_AfterSources(eio_req *req) {
     key = [keys objectAtIndex: i];
     iTunesItem *item = (iTunesItem *)[sourcesDict objectForKey:key];
     [item retain]; // Gets freed when the ObjectWrap is destroyed
-    result->Set(Integer::New(i), Item::WrapInstance(item, (char *)[key UTF8String]));
+    result->Set(Integer::New(i), Item::WrapInstance(item, [key UTF8String]));
   }
   [sourcesDict release];
   argv[1] = result;
@@ -194,7 +194,7 @@ int Application::EIO_CurrentTrack(eio_req *req) {
   iTunesTrack *track = [[app currentTrack] get];
   [track retain];
   ar->result = (void *)track;
-  ar->id = (char *)[[track persistentID] UTF8String];
+  ar->id = [[track persistentID] UTF8String];
   FINISH_EIO_FUNC;
 }
 
@@ -238,7 +238,7 @@ int Application::EIO_AfterSelection(eio_req *req) {
     // TODO: FIX THIS! Doing I/O off of the thread pool!!! Need to create
     // a struct to hold the iTunesItem* as well as the char* persistentID. Then
     // pass that instead of the NSArray*.
-    resultArray->Set(Integer::New(i), Item::WrapInstance(item, (char *)[[item persistentID] UTF8String]));
+    resultArray->Set(Integer::New(i), Item::WrapInstance(item, [[item persistentID] UTF8String]));
   }
   argv[1] = resultArray;
   FINISH_AFTER_FUNC;

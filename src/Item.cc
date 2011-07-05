@@ -78,7 +78,7 @@ int Item::EIO_Container(eio_req *req) {
   iTunesItem *container = [[item container] get];
   [container retain];
   ar->result = (void *)container;
-  ar->id = (char *)[[container persistentID] UTF8String];
+  ar->id = [[container persistentID] UTF8String];
   FINISH_EIO_FUNC;
 }
 

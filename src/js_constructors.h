@@ -12,7 +12,7 @@ struct async_request {
   int32_t intInput;
   void *input;
   void *result;
-  char *id;
+  const char *id;
   pthread_mutex_t *mutex;
 };
 
