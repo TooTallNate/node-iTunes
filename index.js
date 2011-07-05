@@ -9,6 +9,7 @@ var Application = module.exports.Application
 // 'name' on Artwork instances is a no-no apparently...
 Artwork.prototype.name = undefined;
 
+// Custom inspect functions for `console.log` and friends.
 Application.prototype.inspect = function () {
   return inspect(Application.prototype.toString.call(this));
 }
