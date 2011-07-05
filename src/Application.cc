@@ -139,6 +139,7 @@ v8::Handle<Value> Application::Sources(const Arguments& args) {
   HandleScope scope;
   REQUIRE_CALLBACK_ARG;
   INIT(Application);
+  ar->intInput = HAS_INPUT_ARG ? args[0]->Int32Value() : INVALID_INPUT;
   GET_CALLBACK;
   BEGIN_ASYNC(EIO_Sources, EIO_AfterSources);
 }
@@ -148,33 +149,46 @@ int Application::EIO_Sources(eio_req *req) {
   iTunesApplication *item = (iTunesApplication *)ar->itemRef;
   SBElementArray *sources = [item sources];
   NSUInteger count = [sources count];
-  NSMutableDictionary *sourcesDict = [NSMutableDictionary dictionaryWithCapacity: count];
+  int32_t input = ar->intInput;
   iTunesSource *source;
-  for (NSUInteger i=0; i<count; i++) {
-    source = [sources objectAtIndex: i];
-    [sourcesDict setObject: source forKey: [source persistentID]];
+  if (input != INVALID_INPUT) {
+    // TODO: Return an Error if the input is an invalid range
+    source = [sources objectAtIndex: input];
+    [source retain];
+    ar->id = [[source persistentID] UTF8String];
+    ar->result = source;
+  } else {
+    NSMutableDictionary *sourcesDict = [NSMutableDictionary dictionaryWithCapacity: count];
+    for (NSUInteger i=0; i<count; i++) {
+      source = [sources objectAtIndex: i];
+      [sourcesDict setObject: source forKey: [source persistentID]];
+    }
+    [sourcesDict retain];
+    ar->result = sourcesDict;
   }
-  [sourcesDict retain];
-  ar->result = sourcesDict;
   FINISH_EIO_FUNC;
 }
 
 int Application::EIO_AfterSources(eio_req *req) {
   INIT_AFTER_FUNC;
   argv[0] = Null();
-  NSMutableDictionary *sourcesDict = (NSMutableDictionary *)ar->result;
-  NSArray *keys = [sourcesDict allKeys];
-  NSUInteger count = [keys count];
-  Local<Array> result = Array::New(count);
-  NSString *key;
-  for (NSUInteger i=0; i<count; i++) {
-    key = [keys objectAtIndex: i];
-    iTunesItem *item = (iTunesItem *)[sourcesDict objectForKey:key];
-    [item retain]; // Gets freed when the ObjectWrap is destroyed
-    result->Set(Integer::New(i), Item::WrapInstance(item, [key UTF8String]));
+  if (ar->intInput != INVALID_INPUT) {
+    argv[1] = Item::WrapInstance((iTunesItem *)ar->result, ar->id);
+  } else {
+    NSMutableDictionary *sourcesDict = (NSMutableDictionary *)ar->result;
+    NSArray *keys = [sourcesDict allKeys];
+    NSUInteger count = [keys count];
+    Local<Array> result = Array::New(count);
+    NSString *key;
+    for (NSUInteger i=0; i<count; i++) {
+      key = [keys objectAtIndex: i];
+      iTunesItem *item = (iTunesItem *)[sourcesDict objectForKey:key];
+      [item retain]; // Gets freed when the ObjectWrap is destroyed
+      result->Set(Integer::New(i), Item::WrapInstance(item, [key UTF8String]));
+    }
+    [sourcesDict release];
+    argv[1] = result;
   }
-  [sourcesDict release];
-  argv[1] = result;
   FINISH_AFTER_FUNC;
 }
 
