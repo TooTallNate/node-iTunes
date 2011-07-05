@@ -249,7 +249,7 @@ int Application::EIO_AfterSelection(eio_req *req) {
 v8::Handle<Value> Application::Volume(const Arguments& args) {
   HandleScope scope;
   INIT(Application);
-  ar->intInput = HAS_INPUT_ARG ? args[0]->Int32Value() : INVALID_VOLUME;
+  ar->intInput = HAS_INPUT_ARG ? args[0]->Int32Value() : INVALID_INPUT;
   if (HAS_CALLBACK_ARG) {
     GET_CALLBACK;
   }
@@ -258,9 +258,9 @@ v8::Handle<Value> Application::Volume(const Arguments& args) {
 
 int Application::EIO_Volume(eio_req *req) {
   INIT_EIO_FUNC;
-  int32_t input = ar->intInput;
   iTunesApplication *app = (iTunesApplication *)ar->itemRef;
-  if (input != INVALID_VOLUME) {
+  int32_t input = ar->intInput;
+  if (input != INVALID_INPUT) {
     // A value was passed to set the volume to
     [app setSoundVolume: input];
   }

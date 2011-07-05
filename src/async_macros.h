@@ -1,4 +1,4 @@
-#define INVALID_VOLUME 1069
+#define INVALID_INPUT -921221
 
 #define HAS_CALLBACK_ARG args[args.Length()-1]->IsFunction()
 
