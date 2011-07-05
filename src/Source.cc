@@ -48,13 +48,40 @@ int Source::EIO_Kind(eio_req *req) {
   INIT_EIO_FUNC;
   iTunesSource *item = (iTunesSource *)ar->itemRef;
   iTunesESrc kind =  [item kind];
-  NSLog(@"%d", kind);
-  req->result = kind;
+  switch (kind) {
+    case iTunesESrcLibrary:
+      ar->id = "Library";
+      break;
+    case iTunesESrcIPod:
+      ar->id = "iPod";
+      break;
+    case iTunesESrcAudioCD:
+      ar->id = "Audio CD";
+      break;
+    case iTunesESrcMP3CD:
+      ar->id = "MP3 CD";
+      break;
+    case iTunesESrcDevice:
+      ar->id = "Device";
+      break;
+    case iTunesESrcRadioTuner:
+      ar->id = "Radio Tuner";
+      break;
+    case iTunesESrcSharedLibrary:
+      ar->id = "Shared Library";
+      break;
+    default:
+      ar->id = "Unknown";
+      break;
+  }
   FINISH_EIO_FUNC;
 }
 
 int Source::EIO_AfterKind(eio_req *req) {
-
+  INIT_AFTER_FUNC;
+  argv[0] = Null();
+  argv[1] = String::New(ar->id);
+  FINISH_AFTER_FUNC;
 }
 
 } // namespace node_iTunes
