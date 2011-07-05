@@ -7,6 +7,7 @@ function onConn (err, c) {
   if (err) throw err;
   conn = c;
   conn.sources( onSources );
+  conn.sources(1, onFirstSource);
 }
 
 function onSources (err, sources) {
@@ -15,4 +16,9 @@ function onSources (err, sources) {
   sources.forEach(function (source) {
     source.kind(console.log);
   });
+}
+
+function onFirstSource (err, source) {
+  if (err) throw err;
+  console.log(source);
 }
