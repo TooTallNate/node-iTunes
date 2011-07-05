@@ -213,6 +213,7 @@ v8::Handle<Value> Application::Selection(const Arguments& args) {
   HandleScope scope;
   REQUIRE_CALLBACK_ARG;
   INIT(Application);
+  ar->intInput = HAS_INPUT_ARG ? args[0]->Int32Value() : INVALID_INPUT;
   GET_CALLBACK;
   BEGIN_ASYNC(EIO_Selection, EIO_AfterSelection);
 }
@@ -220,9 +221,20 @@ v8::Handle<Value> Application::Selection(const Arguments& args) {
 int Application::EIO_Selection(eio_req *req) {
   INIT_EIO_FUNC;
   iTunesApplication *app = (iTunesApplication *)ar->itemRef;
+  // Why is 'get' necessary here? It shouldn't be but SB sucks...
   NSArray *selectionGet = [[app selection] get];
-  [selectionGet retain];
-  ar->result = selectionGet;
+  int32_t input = ar->intInput;
+  if (input != INVALID_INPUT) {
+    // If a Number input was specified, then return only the specified index
+    // TODO: Return an Error when 'input' >= [selectionGet count]
+    iTunesItem *item = [selectionGet objectAtIndex: input];
+    [item retain];
+    ar->id = [[item persistentID] UTF8String];
+    ar->result = item;
+  } else {
+    [selectionGet retain];
+    ar->result = selectionGet;
+  }
   FINISH_EIO_FUNC;
 }
 
@@ -230,17 +242,23 @@ int Application::EIO_AfterSelection(eio_req *req) {
   INIT_AFTER_FUNC;
   // TODO: Error Handling
   argv[0] = Null();
-  NSArray *selection = (NSArray *)ar->result;
-  Local<Array> resultArray = Array::New([selection count]);
-  iTunesItem *item;
-  for (NSUInteger i = 0; i < [selection count]; i++) {
-    item = [selection objectAtIndex: i];
-    // TODO: FIX THIS! Doing I/O off of the thread pool!!! Need to create
-    // a struct to hold the iTunesItem* as well as the char* persistentID. Then
-    // pass that instead of the NSArray*.
-    resultArray->Set(Integer::New(i), Item::WrapInstance(item, [[item persistentID] UTF8String]));
+  if (ar->intInput != INVALID_INPUT) {
+    argv[1] = Item::WrapInstance((iTunesItem *)ar->result, ar->id);
+  } else {
+    NSArray *selection = (NSArray *)ar->result;
+    Local<Array> resultArray = Array::New([selection count]);
+    iTunesItem *item;
+    for (NSUInteger i = 0; i < [selection count]; i++) {
+      item = [selection objectAtIndex: i];
+      [item retain];
+      // TODO: FIX THIS! Doing I/O off of the thread pool!!! Need to create
+      // a struct to hold the iTunesItem* as well as the char* persistentID. Then
+      // pass that instead of the NSArray*.
+      resultArray->Set(Integer::New(i), Item::WrapInstance(item, [[item persistentID] UTF8String]));
+    }
+    [selection release];
+    argv[1] = resultArray;
   }
-  argv[1] = resultArray;
   FINISH_AFTER_FUNC;
 }
 
