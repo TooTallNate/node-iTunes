@@ -35,8 +35,7 @@
 #define INIT_EIO_FUNC   \
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];   \
   async_request *ar = (async_request *)req->data;     \
-  pthread_mutex_lock( ar->mutex );        \
-  usleep(10 * 1000);
+  pthread_mutex_lock( ar->mutex );
 
 
 #define FINISH_EIO_FUNC    \
