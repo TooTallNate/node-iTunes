@@ -108,9 +108,12 @@ int Track::EIO_Artist (eio_req *req) {
     NSString *val = [NSString stringWithCString: (const char *)ar->input encoding: NSUTF8StringEncoding];
     [item setArtist: val];
   }
-  NSString *str = [item artist];
-  [str retain];
-  ar->id = [str UTF8String];
+  NSString *val = [item artist];
+  //NSLog(@"%@", val);
+  const char *cStr = [val UTF8String];
+  ar->id = (const char *)malloc(strlen(cStr) + 1);
+  strcpy((char *)ar->id, cStr);
+  //ar->id = "test";
   FINISH_EIO_FUNC;
 }
 
